@@ -21,9 +21,9 @@ const URL_SESSAO = 'https://api-advogada.siterefrigeracaoeliezer.workers.dev/api
 // Mapa: sufixo da página → tema
 const TEMA_SUFIXOS = {
   'obsidian':   '-obsidian',
-  'masculino':  '',
+  'masculino':  '-masculino',
   'feminino-r': '-feminino-r',
-  'feminino-q': '-masculino',        // padrão = sem sufixo
+  'feminino-q': '',        // padrão = sem sufixo
 };
 
 // Páginas que participam do sistema de temas
