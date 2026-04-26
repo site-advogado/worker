@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' https://blogger.googleusercontent.com data:; connect-src 'self' https://*.workers.dev;">
+  <title>Minha Linha do Tempo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --gold:#C5A059; --gold-light:#D4B578; --gold-dim:rgba(197,160,89,0.1);
+      --gold-border:rgba(197,160,89,0.28);
+      --cream:#FAF8F3; --ink:#1C1917; --ink-soft:#44403C; --ink-muted:#A8A29E;
+      --g-card-bg:#FAF8F3; --g-border:rgba(197,160,89,0.25); --g-radius:4px;
+      --g-radius-sm:2px; --g-accent:#C5A059; --g-text:#1C1917;
+      --g-text-soft:#44403C; --g-font-serif:'Playfair Display',serif;
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Jost',sans-serif; background:var(--cream); color:var(--ink); min-height:100vh; overflow-x:hidden; -webkit-user-select:none; user-select:none; transition:background 0.4s,color 0.4s; }
+    input,textarea { -webkit-user-select:text !important; user-select:text !important; }
+    img { pointer-events:none; -webkit-user-drag:none; }
+
+    html.dark body   { background:#0F0E0C; color:#EAE2D8; --g-card-bg:#131210; --g-text:#EAE2D8; --g-text-soft:#8A847E; }
+    html.dark header { background:rgba(15,14,12,0.88); border-color:rgba(197,160,89,0.15); }
+    html.dark .card  { background:rgba(20,18,14,0.92); border-color:rgba(197,160,89,0.13); }
+    html.dark .tl-item { background:rgba(18,16,12,0.95); border-color:rgba(197,160,89,0.12); }
+
+    /* ── Deco ── */
+    .bg-deco { position:fixed; inset:0; pointer-events:none; z-index:0; }
+    .bg-deco::before { content:''; position:absolute; top:-200px; right:-200px; width:600px; height:600px; background:radial-gradient(circle,rgba(197,160,89,0.05) 0%,transparent 70%); border-radius:50%; }
+    .bg-grid { position:fixed; top:0; right:0; width:220px; height:220px; background-image:linear-gradient(var(--gold-border) 1px,transparent 1px),linear-gradient(90deg,var(--gold-border) 1px,transparent 1px); background-size:24px 24px; mask-image:radial-gradient(ellipse at top right,black 0%,transparent 65%); -webkit-mask-image:radial-gradient(ellipse at top right,black 0%,transparent 65%); pointer-events:none; z-index:0; opacity:0.45; }
+
+    /* ── Loader ── */
+    #globalLoader { position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; background:rgba(250,248,243,0.94); backdrop-filter:blur(10px); }
+    html.dark #globalLoader { background:rgba(15,14,12,0.94); }
+    .loader-wrap { display:flex; flex-direction:column; align-items:center; gap:16px; }
+    .loader-ring { width:42px; height:42px; border:1.5px solid var(--gold-border); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg);} }
+    .loader-label { font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:0.3em; color:var(--gold); text-transform:uppercase; }
+
+    /* ── Header ── */
+    header { position:fixed; top:0; left:0; right:0; z-index:100; padding:16px 24px; display:flex; align-items:center; justify-content:space-between; background:rgba(250,248,243,0.82); backdrop-filter:blur(20px); border-bottom:1px solid var(--gold-border); }
+    .hdr-brand { display:flex; align-items:center; gap:10px; }
+    .hdr-icon { width:36px; height:36px; border:1px solid var(--gold-border); border-radius:2px; display:flex; align-items:center; justify-content:center; }
+    .hdr-icon i { color:var(--gold); font-size:13px; }
+    .hdr-title { font-family:'Cormorant Garamond',serif; font-size:12px; letter-spacing:0.22em; color:var(--ink-soft); text-transform:uppercase; }
+    html.dark .hdr-title { color:#8A847E; }
+    .hdr-actions { display:flex; align-items:center; gap:8px; }
+    .btn-icon { width:36px; height:36px; display:flex; align-items:center; justify-content:center; background:none; border:1px solid var(--gold-border); border-radius:2px; color:var(--gold); cursor:pointer; font-size:13px; transition:background 0.25s; }
+    .btn-icon:hover { background:var(--gold-dim); }
+    .btn-sair { padding:7px 16px; background:none; border:1px solid rgba(200,80,60,0.3); border-radius:2px; font-family:'Jost',sans-serif; font-size:10px; letter-spacing:0.14em; color:#E08070; cursor:pointer; text-transform:uppercase; transition:all 0.25s; }
+    .btn-sair:hover { background:rgba(200,80,60,0.1); }
+
+    /* ── Main ── */
+    main { position:relative; z-index:1; padding:88px 20px 60px; max-width:520px; margin:0 auto; }
+
+    /* ── Welcome ── */
+    .welcome { text-align:center; margin-bottom:28px; }
+    .welcome-eyebrow { font-family:'Cormorant Garamond',serif; font-size:10px; letter-spacing:0.35em; color:var(--gold); text-transform:uppercase; margin-bottom:6px; }
+    .welcome-name { font-family:'Playfair Display',serif; font-size:20px; font-weight:600; color:var(--ink); }
+    html.dark .welcome-name { color:#EAE2D8; }
+
+    /* ── Carrossel ── */
+    #carouselWrap { margin-bottom:6px; }
+    #processCarousel { display:flex; overflow-x:auto; scroll-snap-type:x mandatory; gap:14px; padding:8px 0; scrollbar-width:none; cursor:grab; }
+    #processCarousel:active { cursor:grabbing; }
+    #processCarousel::-webkit-scrollbar { display:none; }
+    #processCarousel.single { justify-content:center; cursor:default; }
+    .proc-card { flex:0 0 85%; scroll-snap-align:center; background:rgba(255,255,255,0.72); backdrop-filter:blur(12px); border:1px solid var(--gold-border); border-radius:4px; padding:20px; position:relative; overflow:hidden; transition:border-color 0.3s,transform 0.3s; cursor:pointer; }
+    html.dark .proc-card { background:rgba(20,18,14,0.88); }
+    .proc-card::before { content:''; position:absolute; top:0; left:10px; right:10px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0.5; }
+    .proc-card.active { border-color:var(--gold); transform:scale(1.01); box-shadow:0 8px 32px rgba(197,160,89,0.12); }
+    .proc-card.single-card { flex:0 0 auto; width:100%; max-width:440px; cursor:default; }
+    .pc-eyebrow { font-size:9px; font-weight:500; letter-spacing:0.22em; color:var(--gold); text-transform:uppercase; margin-bottom:4px; }
+    .pc-num { font-family:'Playfair Display',serif; font-size:14px; font-weight:400; color:var(--ink); }
+    html.dark .pc-num { color:#EAE2D8; }
+    .pc-obs { font-size:11px; color:var(--ink-muted); margin-top:10px; display:flex; align-items:center; gap:6px; }
+
+    /* Dots — ocultos quando 1 processo */
+    #carouselDots { display:flex; justify-content:center; gap:6px; margin-bottom:20px; }
+    #carouselDots.hidden { display:none; }
+    .dot { width:6px; height:6px; border-radius:50%; background:var(--gold); opacity:0.25; transition:opacity 0.3s; }
+    .dot.active { opacity:1; transform:scale(1.3); }
+
+    /* ── Cards de status ── */
+    .status-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px; }
+    .status-card { background:rgba(255,255,255,0.72); backdrop-filter:blur(12px); border:1px solid var(--gold-border); border-radius:4px; padding:16px; }
+    html.dark .status-card { background:rgba(20,18,14,0.88); }
+    .status-card.wide { grid-column:1/-1; }
+    .status-card::before { content:''; display:block; width:100%; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin-bottom:10px; }
+    .sc-label { font-size:9px; font-weight:500; letter-spacing:0.2em; color:var(--gold); text-transform:uppercase; margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; }
+    .sc-ping { width:6px; height:6px; border-radius:50%; background:var(--gold); animation:ping 1.5s infinite; }
+    @keyframes ping { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.5;transform:scale(1.4);} }
+    .sc-value { font-family:'Playfair Display',serif; font-size:17px; font-weight:400; color:var(--ink); line-height:1.3; }
+    html.dark .sc-value { color:#EAE2D8; }
+    .sc-sub { font-size:10px; color:var(--ink-muted); margin-top:4px; }
+
+    /* ── Progresso circular ── */
+    .progress-wrap { display:flex; flex-direction:column; align-items:center; gap:8px; }
+    .progress-svg { width:64px; height:64px; transform:rotate(-90deg); }
+    .progress-label { font-size:10px; font-weight:500; letter-spacing:0.12em; color:var(--gold); text-transform:uppercase; text-align:center; }
+
+    /* ── Timeline ── */
+    .tl-section { position:relative; }
+    .tl-section-title { font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:0.3em; color:var(--gold); text-transform:uppercase; text-align:center; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+    .tl-section-title::before, .tl-section-title::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--gold-border)); }
+    .tl-section-title::after { background:linear-gradient(270deg,transparent,var(--gold-border)); }
+    .tl-line { position:absolute; left:15px; top:0; bottom:0; width:1px; background:linear-gradient(to bottom,var(--gold),transparent); opacity:0.25; }
+    #timelineContainer { position:relative; padding-left:40px; display:flex; flex-direction:column; gap:16px; }
+    .tl-item { background:rgba(255,255,255,0.72); backdrop-filter:blur(12px); border:1px solid var(--gold-border); border-radius:4px; padding:18px; position:relative; animation:fadeUp 0.5s ease both; }
+    html.dark .tl-item { background:rgba(20,18,14,0.88); }
+    .tl-item::before { content:''; position:absolute; top:0; left:8px; right:8px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0.4; }
+    .tl-dot { position:absolute; left:-31px; top:20px; width:12px; height:12px; border:1px solid var(--gold); background:linear-gradient(135deg,var(--gold),#9A7535); border-radius:50%; }
+    .tl-date { font-size:9px; font-weight:500; letter-spacing:0.2em; color:var(--gold); text-transform:uppercase; margin-bottom:5px; display:flex; align-items:center; gap:8px; }
+    .tl-status { font-family:'Playfair Display',serif; font-size:15px; font-weight:400; color:var(--ink); margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+    html.dark .tl-status { color:#EAE2D8; }
+    .tl-desc { font-family:'Cormorant Garamond',serif; font-size:14px; font-style:italic; color:var(--ink-soft); line-height:1.65; }
+    html.dark .tl-desc { color:#8A847E; }
+
+    /* Glossário btn */
+    .glossario-btn { background:none; border:none; cursor:pointer; color:var(--gold); opacity:0.55; font-size:12px; padding:1px 3px; transition:opacity 0.2s; }
+    .glossario-btn:hover { opacity:1; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:translateY(0);} }
+  </style>
+</head>
+<body>
+
+<div class="bg-deco"></div>
+<div class="bg-grid"></div>
+
+<div id="globalLoader">
+  <div class="loader-wrap">
+    <div class="loader-ring"></div>
+    <span class="loader-label">Sincronizando</span>
+  </div>
+</div>
+
+<header>
+  <div class="hdr-brand">
+    <div class="hdr-icon"><i class="fas fa-shield-halved"></i></div>
+    <span class="hdr-title">Área Segura</span>
+  </div>
+  <div class="hdr-actions">
+    <button class="btn-icon" onclick="toggleDarkMode()"><i id="themeIcon" class="fas fa-moon"></i></button>
+    <button class="btn-sair" onclick="logout()">Sair</button>
+  </div>
+</header>
+
+<main>
+  <div class="welcome">
+    <p class="welcome-eyebrow">Bem-vindo(a)</p>
+    <h2 class="welcome-name" id="clienteName">...</h2>
+  </div>
+
+  <!-- Carrossel de processos -->
+  <div id="carouselWrap">
+    <div id="processCarousel"></div>
+  </div>
+  <div id="carouselDots" class="hidden"></div>
+
+  <!-- Status cards -->
+  <div class="status-grid">
+    <div class="status-card wide">
+      <div class="sc-label">Status Atual <span class="sc-ping"></span></div>
+      <div class="sc-value" id="statusAtual">...</div>
+    </div>
+    <div class="status-card">
+      <div class="sc-label">Progresso</div>
+      <div class="progress-wrap">
+        <svg class="progress-svg" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="26" stroke="rgba(197,160,89,0.1)" stroke-width="4" fill="none"/>
+          <circle id="progressCircle" cx="32" cy="32" r="26" stroke="url(#gGrad)" stroke-width="4" fill="none"
+            stroke-dasharray="163.4" stroke-dashoffset="163.4"
+            stroke-linecap="round" style="transition:stroke-dashoffset 1s ease;"/>
+          <defs>
+            <linearGradient id="gGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#C5A059"/>
+              <stop offset="100%" stop-color="#9A7535"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span id="progressPct" style="font-family:'Playfair Display',serif;font-size:11px;font-weight:600;color:var(--gold);">0%</span>
+      </div>
+      <div class="sc-sub" id="faseLabel" style="text-align:center;margin-top:6px;"></div>
+    </div>
+    <div class="status-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+      <div class="sc-label">Eventos</div>
+      <div class="sc-value" id="eventCount" style="font-size:32px;">0</div>
+      <div class="sc-sub">registrados</div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="tl-section">
+    <div class="tl-section-title">Linha do Tempo</div>
+    <div id="timelineContainer">
+      <div class="tl-line"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Modal Glossário -->
+<div id="glossarioModal" class="hidden" style="position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(28,25,23,0.55);backdrop-filter:blur(14px);" onclick="if(event.target===this)fecharGlossario()">
+  <div style="background:var(--g-card-bg);border:1px solid var(--g-border);border-radius:var(--g-radius);max-width:350px;width:100%;padding:28px 24px;position:relative;animation:scaleIn 0.25s ease;">
+    <div style="position:absolute;top:0;left:12px;right:12px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <div style="width:34px;height:34px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="fas fa-scale-balanced" style="color:var(--gold);font-size:12px;"></i>
+      </div>
+      <div>
+        <p style="font-size:9px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);opacity:0.8;">Glossário Jurídico</p>
+        <h3 id="glossarioTitulo" style="font-family:'Playfair Display',serif;font-size:16px;font-weight:400;color:var(--g-text);"></h3>
+      </div>
+    </div>
+    <p id="glossarioTexto" style="font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;line-height:1.7;color:var(--g-text-soft);"></p>
+    <button onclick="fecharGlossario()" style="margin-top:20px;width:100%;padding:11px;background:linear-gradient(135deg,var(--gold),#9A7535);border:none;border-radius:2px;color:#fff;font-family:'Jost',sans-serif;font-size:10px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;">Entendido</button>
+  </div>
+</div>
+<style>@keyframes scaleIn{from{opacity:0;transform:scale(0.96);}to{opacity:1;transform:scale(1);}}</style>
+
+<script src="tema.js"></script>
+<script>
+let globalData   = [];
+let activeId     = null;
+let scrollLocked = false;
+let scrollTimer  = null;
+
+// ── Init ──────────────────────────────────────────────────
+async function init() {
+  // 1. Verificar sessão + tema
+  const sessao = await verificarSessaoComTema('cliente'); // de tema.js
+  if (!sessao) return; // redirecionou
+
+  // 2. Buscar timeline
+  try {
+    const res  = await fetch('https://api-advogada.siterefrigeracaoeliezer.workers.dev/api/v1', {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'timeline' })
+      // Sem email no body — Worker lê do JWT (IDOR fix)
+    });
+    const data = await res.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      document.getElementById('clienteName').textContent = sessao.usuario || 'Usuário';
+      document.getElementById('statusAtual').textContent = 'Nenhum processo encontrado';
+      return;
+    }
+
+    globalData = data;
+    renderCarousel();
+  } catch (err) {
+    console.error('Erro timeline:', err);
+    window.location.href = 'index.html';
+  } finally {
+    setTimeout(() => { document.getElementById('globalLoader').style.display='none'; }, 500);
+  }
+}
+
+// ── Carrossel ─────────────────────────────────────────────
+function renderCarousel() {
+  const carousel = document.getElementById('processCarousel');
+  const dotsWrap = document.getElementById('carouselDots');
+  const isSingle = globalData.length === 1;
+
+  if (isSingle) {
+    carousel.classList.add('single');
+    dotsWrap.classList.add('hidden');
+  } else {
+    dotsWrap.classList.remove('hidden');
+  }
+
+  // Cards
+  carousel.innerHTML = '';
+  globalData.forEach((proc, i) => {
+    const card = document.createElement('div');
+    card.className = `proc-card${isSingle ? ' single-card' : ''}`;
+    card.dataset.id = proc.id;
+
+    const eyebrow = document.createElement('p');
+    eyebrow.className = 'pc-eyebrow';
+    eyebrow.textContent = proc.tipo_acao || 'Processo';
+
+    const num = document.createElement('p');
+    num.className = 'pc-num';
+    num.textContent = proc.numero_processo || 'S/N';
+
+    const obs = document.createElement('p');
+    obs.className = 'pc-obs';
+    obs.innerHTML = '<i class="fas fa-circle-info" style="color:var(--gold);opacity:0.5;font-size:10px;"></i>';
+    const obsSpan = document.createElement('span');
+    obsSpan.textContent = proc.obs || 'Sem observações adicionais';
+    obs.appendChild(obsSpan);
+
+    card.append(eyebrow, num, obs);
+    if (!isSingle) card.addEventListener('click', () => selectProcess(proc.id));
+    carousel.appendChild(card);
+  });
+
+  // Dots
+  dotsWrap.innerHTML = '';
+  if (!isSingle) {
+    globalData.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      dot.id = `dot-${i}`;
+      dotsWrap.appendChild(dot);
+    });
+    setupCarouselScroll(carousel);
+    setupDraggable(carousel);
+  }
+
+  selectProcess(globalData[0].id);
+}
+
+function setupCarouselScroll(carousel) {
+  carousel.addEventListener('scroll', () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      let closest = null, minOff = Infinity;
+      carousel.querySelectorAll('.proc-card').forEach(card => {
+        const r   = card.getBoundingClientRect();
+        const off = Math.abs(r.left + r.width/2 - window.innerWidth/2);
+        if (off < minOff) { minOff = off; closest = card; }
+      });
+      if (closest) selectProcess(closest.dataset.id);
+    }, 80);
+  });
+}
+
+function setupDraggable(slider) {
+  let isDown=false, startX, scrollLeft;
+  slider.addEventListener('mousedown',  e=>{ isDown=true; startX=e.pageX-slider.offsetLeft; scrollLeft=slider.scrollLeft; });
+  slider.addEventListener('mouseleave', ()=>{ isDown=false; });
+  slider.addEventListener('mouseup',    ()=>{ isDown=false; });
+  slider.addEventListener('mousemove',  e=>{ if(!isDown)return; const walk=e.pageX-slider.offsetLeft-startX; if(Math.abs(walk)>5){e.preventDefault();slider.scrollLeft=scrollLeft-walk;} });
+}
+
+// ── Selecionar processo ────────────────────────────────────
+function selectProcess(id) {
+  const idStr = String(id);
+  const proc  = globalData.find(p => String(p.id) === idStr);
+  if (!proc) return;
+  activeId = idStr;
+
+  // Nome
+  document.getElementById('clienteName').textContent = proc.cliente || 'Usuário';
+
+  // Cards
+  document.querySelectorAll('.proc-card').forEach(c => c.classList.toggle('active', c.dataset.id === idStr));
+
+  // Dots
+  const idx = globalData.findIndex(p => String(p.id) === idStr);
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===idx));
+
+  // Status
+  const ats     = Array.isArray(proc.atualizacoes) ? proc.atualizacoes : [];
+  const ultimo  = ats[ats.length-1] || { status:'Nenhum' };
+  document.getElementById('statusAtual').textContent  = ultimo.status;
+  document.getElementById('eventCount').textContent   = ats.length;
+
+  // Progresso por fase (não por número de cards)
+  const pct    = parseInt(proc.fase_atual, 10) || 10;
+  const circum = 2 * Math.PI * 26; // r=26
+  document.getElementById('progressCircle').style.strokeDashoffset = circum * (1 - pct/100);
+  document.getElementById('progressPct').textContent  = pct + '%';
+  document.getElementById('faseLabel').textContent    = getFaseLabel(pct); // de tema.js
+
+  // Timeline (via DOM — XSS safe)
+  const container = document.getElementById('timelineContainer');
+  // Manter a linha vertical
+  container.innerHTML = '<div class="tl-line"></div>';
+
+  [...ats].reverse().forEach((ev, i) => {
+    const item = document.createElement('div');
+    item.className = 'tl-item';
+    item.style.animationDelay = `${i * 0.08}s`;
+
+    const dot = document.createElement('div');
+    dot.className = 'tl-dot';
+
+    const dateRow = document.createElement('div');
+    dateRow.className = 'tl-date';
+    const dateSpan = document.createElement('span');
+    dateSpan.textContent = formatDate(ev.data); // de tema.js
+    dateRow.appendChild(dateSpan);
+
+    const statusRow = document.createElement('div');
+    statusRow.className = 'tl-status';
+    const statusSpan = document.createElement('span');
+    statusSpan.textContent = ev.status || '';
+    statusRow.appendChild(statusSpan);
+
+    // Botão glossário
+    const GLOSSARIO = {
+      'Petição Inicial Protocolada':true,'Aguardando Citação':true,
+      'Audiência de Conciliação Designada':true,'Audiência de Instrução e Julgamento':true,
+      'Sentença Proferida':true,'Fase de Execução / Cálculos':true,'Processo Finalizado / Arquivado':true
+    };
+    if (GLOSSARIO[ev.status]) {
+      const gBtn = document.createElement('button');
+      gBtn.className = 'glossario-btn';
+      gBtn.title = 'O que significa isso?';
+      gBtn.innerHTML = '<i class="fas fa-circle-question"></i>';
+      gBtn.addEventListener('click', () => abrirGlossario(encodeURIComponent(ev.status)));
+      statusRow.appendChild(gBtn);
+    }
+
+    const desc = document.createElement('p');
+    desc.className = 'tl-desc';
+    desc.textContent = ev.descricao || 'Sem descrição.';
+
+    item.append(dot, dateRow, statusRow, desc);
+    container.appendChild(item);
+  });
+}
+
+// ── Glossário (usa funções de tema.js) ────────────────────
+function abrirGlossario(statusEncoded) {
+  const status = decodeURIComponent(statusEncoded);
+  const GLOSSARIO_DATA = {
+    'Petição Inicial Protocolada':{ titulo:'Petição Inicial', texto:'É o documento que dá início ao processo judicial. Nele, seu advogado apresenta os fatos, os fundamentos jurídicos e os pedidos ao juiz.' },
+    'Aguardando Citação':{ titulo:'Citação', texto:'É o ato oficial pelo qual a parte contrária é comunicada da existência do processo e convocada a se defender.' },
+    'Audiência de Conciliação Designada':{ titulo:'Audiência de Conciliação', texto:'Reunião formal onde um mediador tenta aproximar as partes para chegarem a um acordo sem precisar de julgamento.' },
+    'Audiência de Instrução e Julgamento':{ titulo:'Audiência de Instrução', texto:'Sessão onde testemunhas são ouvidas, provas são apresentadas e o juiz colhe os elementos necessários para proferir a sentença.' },
+    'Sentença Proferida':{ titulo:'Sentença', texto:'É a decisão final do juiz de primeira instância. Ela pode ser favorável ou desfavorável, e pode ser objeto de recurso.' },
+    'Fase de Execução / Cálculos':{ titulo:'Fase de Execução', texto:'Após a sentença definitiva, esta fase trata de efetivar a decisão — ou seja, fazer com que a parte vencedora receba o que lhe é de direito.' },
+    'Processo Finalizado / Arquivado':{ titulo:'Processo Finalizado', texto:'O processo chegou ao fim. Todas as obrigações foram cumpridas e o processo foi arquivado pelo juízo.' },
+  };
+  const entry = GLOSSARIO_DATA[status];
+  if (!entry) return;
+  document.getElementById('glossarioTitulo').textContent = entry.titulo;
+  document.getElementById('glossarioTexto').textContent  = entry.texto;
+  const modal = document.getElementById('glossarioModal');
+  modal.style.display = 'flex';
+  modal.classList.remove('hidden');
+}
+function fecharGlossario() {
+  const modal = document.getElementById('glossarioModal');
+  modal.style.display = 'none';
+  modal.classList.add('hidden');
+}
+
+// ── Tema ──────────────────────────────────────────────────
+function toggleDarkMode() {
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('ADV_GLOBAL_THEME', isDark ? 'dark' : 'light');
+  document.getElementById('themeIcon').classList.replace(isDark?'fa-moon':'fa-sun', isDark?'fa-sun':'fa-moon');
+}
+
+// ── DOMContentLoaded ──────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const isDark = localStorage.getItem('ADV_GLOBAL_THEME') === 'dark';
+  document.documentElement.classList.toggle('dark', isDark);
+  const icon = document.getElementById('themeIcon');
+  if (icon) icon.classList.replace(isDark?'fa-moon':'fa-sun', isDark?'fa-sun':'fa-moon');
+  init();
+});
+</script>
+</body>
+</html>
