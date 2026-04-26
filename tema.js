@@ -15,7 +15,7 @@
 //   feminino-q  → *-feminino-q.html (playfair quadrado) ← padrão
 // ============================================================
 
-const URL_API    = 'https://api-advogada.siterefrigeracaoeliezer.workers.dev/api/v1';
+
 const URL_SESSAO = 'https://api-advogada.siterefrigeracaoeliezer.workers.dev/api/verificar-sessao';
 
 // Mapa: sufixo da página → tema
