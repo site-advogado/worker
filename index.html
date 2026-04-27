@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' https://blogger.googleusercontent.com data:; connect-src 'self' https://*.workers.dev;">
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Advocacia">
+  <link rel="apple-touch-icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhHtE2js3Aj9ZLxGzW-qg0iuRkcQvHrLMREwdxYyxwFQZ9IoEp_lYYjezzImcmSIoIPT0GDbAKn0HgZY757h6ob0P-RArslGJ8ca8R395S1oruz8a0R_BXc9OMWQwpqodGTFwq3rNdhshjmU9GgIvaBNAr7JmvgrH6GpbbxqgPXHy_42z9P43RM4frkdlc/w494-h494/logo.png">
+  <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhHtE2js3Aj9ZLxGzW-qg0iuRkcQvHrLMREwdxYyxwFQZ9IoEp_lYYjezzImcmSIoIPT0GDbAKn0HgZY757h6ob0P-RArslGJ8ca8R395S1oruz8a0R_BXc9OMWQwpqodGTFwq3rNdhshjmU9GgIvaBNAr7JmvgrH6GpbbxqgPXHy_42z9P43RM4frkdlc/w494-h494/logo.png">
+
+  <title>Advocacia | Portal do Cliente</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ── CSS Variables — preenchidas dinamicamente por tema.js ── */
+    :root {
+      --gold:#C5A059; --gold-light:#D4B578; --gold-dim:rgba(197,160,89,0.1);
+      --gold-border:rgba(197,160,89,0.28);
+      --cream:#FAF8F3; --ink:#1C1917; --ink-soft:#44403C; --ink-muted:#A8A29E;
+      --font-serif:'Playfair Display',serif; --font-body:'Jost',sans-serif; --radius:4px;
+      /* vars do glossário / tema */
+      --g-card-bg:#FAF8F3; --g-border:rgba(197,160,89,0.25);
+      --g-radius:4px; --g-radius-sm:2px;
+      --g-accent:#C5A059; --g-text:#1C1917; --g-text-soft:#44403C;
+      --g-font-serif:'Playfair Display',serif;
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:var(--font-body,'Jost',sans-serif);
+      background:var(--cream); color:var(--ink);
+      min-height:100vh; overflow-x:hidden;
+      -webkit-user-select:none; user-select:none;
+      transition:background 0.4s,color 0.4s;
+    }
+    input, select, textarea { -webkit-user-select:text !important; user-select:text !important; }
+    img { pointer-events:none; -webkit-user-drag:none; }
+
+    /* ── Dark mode ── */
+    html.dark body            { background:#0F0E0C; color:#EAE2D8; }
+    html.dark                 { --g-card-bg:#131210; --g-text:#EAE2D8; --g-text-soft:#8A847E; }
+    html.dark header          { background:rgba(15,14,12,0.88); border-color:rgba(197,160,89,0.15); }
+    html.dark .bio-name       { color:#EAE2D8; }
+    html.dark .search-card    { background:rgba(20,18,14,0.88); }
+    html.dark .modal          { background:#131210; }
+    html.dark .field-inner input { background:rgba(28,26,22,0.9); color:#EAE2D8; border-color:rgba(197,160,89,0.18); }
+    html.dark .otp-input      { background:rgba(28,26,22,0.9); color:#EAE2D8; }
+    html.dark .contact-pill   { background:rgba(20,18,14,0.7); color:#8A847E; }
+    html.dark .sc-title       { color:#EAE2D8; }
+    html.dark .modal-title    { color:#EAE2D8; }
+    html.dark .modal-msg      { color:#8A847E; }
+    html.dark .primeiro-acesso-banner { background:rgba(197,160,89,0.08); border-color:rgba(197,160,89,0.2); }
+    html.dark .primeiro-acesso-banner p { color:#A09890; }
+    html.dark .notif-banner   { background:rgba(197,160,89,0.1); border-color:rgba(197,160,89,0.25); }
+    html.dark .notif-banner p { color:#C5A059; }
+    html.dark .bio-desc       { color:#8A847E; }
+    html.dark #globalLoader   { background:rgba(15,14,12,0.94); }
+
+    /* ── Background decorativo ── */
+    .bg-deco { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+    .bg-deco::before { content:''; position:absolute; top:-200px; right:-200px; width:700px; height:700px; background:radial-gradient(circle,rgba(197,160,89,0.06) 0%,transparent 70%); border-radius:50%; }
+    .bg-deco::after  { content:''; position:absolute; bottom:-100px; left:-100px; width:500px; height:500px; background:radial-gradient(circle,rgba(197,160,89,0.04) 0%,transparent 70%); border-radius:50%; }
+    .bg-grid { position:fixed; top:0; right:0; width:280px; height:280px; background-image:linear-gradient(var(--gold-border) 1px,transparent 1px),linear-gradient(90deg,var(--gold-border) 1px,transparent 1px); background-size:28px 28px; mask-image:radial-gradient(ellipse at top right,black 0%,transparent 65%); -webkit-mask-image:radial-gradient(ellipse at top right,black 0%,transparent 65%); pointer-events:none; z-index:0; opacity:0.5; }
+
+    /* ── Loader ── */
+    #globalLoader { position:fixed; inset:0; z-index:9999; display:none; align-items:center; justify-content:center; background:rgba(250,248,243,0.94); backdrop-filter:blur(10px); }
+    #globalLoader[style*="flex"], #globalLoader.show { display:flex; }
+    .loader-wrap  { display:flex; flex-direction:column; align-items:center; gap:16px; }
+    .loader-ring  { width:42px; height:42px; border:1.5px solid var(--gold-border); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg);} }
+    .loader-label { font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:0.3em; color:var(--gold); text-transform:uppercase; }
+
+    /* ── Header ── */
+    header { position:fixed; top:0; left:0; right:0; z-index:100; padding:18px 28px; display:flex; align-items:center; justify-content:space-between; background:rgba(250,248,243,0.82); backdrop-filter:blur(20px); border-bottom:1px solid var(--gold-border); }
+    .hdr-brand   { font-family:'Cormorant Garamond',serif; font-size:13px; font-weight:400; letter-spacing:0.22em; color:var(--ink-soft); text-transform:uppercase; }
+    .hdr-actions { display:flex; align-items:center; gap:8px; }
+    #installApp  { display:none; align-items:center; gap:6px; padding:7px 14px; background:transparent; border:1px solid var(--gold-border); border-radius:var(--radius,4px); font-family:'Jost',sans-serif; font-size:10px; letter-spacing:0.14em; color:var(--gold); cursor:pointer; text-transform:uppercase; transition:background 0.25s; }
+    #installApp:hover { background:var(--gold-dim); }
+    .btn-theme   { width:36px; height:36px; display:flex; align-items:center; justify-content:center; background:none; border:1px solid var(--gold-border); border-radius:var(--radius,4px); color:var(--gold); cursor:pointer; font-size:13px; transition:background 0.25s; }
+    .btn-theme:hover { background:var(--gold-dim); }
+
+    /* ── Main ── */
+    main { position:relative; z-index:1; padding:110px 24px 64px; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
+
+    /* ── Banner de primeiro acesso ── */
+    .primeiro-acesso-banner {
+      display:none; width:100%; max-width:440px; margin-bottom:20px;
+      background:rgba(197,160,89,0.07); border:1px solid var(--gold-border);
+      border-left:3px solid var(--gold); border-radius:var(--radius,4px);
+      padding:14px 18px; gap:12px; align-items:flex-start;
+      animation:fadeUp 0.5s ease both;
+    }
+    .primeiro-acesso-banner[style*="flex"] { display:flex; }
+    .primeiro-acesso-banner i { color:var(--gold); font-size:14px; margin-top:2px; flex-shrink:0; }
+    .primeiro-acesso-banner p { font-size:12px; color:var(--ink-soft); line-height:1.6; }
+    .primeiro-acesso-banner strong { color:var(--gold); font-weight:500; }
+
+    /* ── Banner de notificação ── */
+    .notif-banner {
+      display:none; width:100%; max-width:440px; margin-bottom:16px;
+      background:rgba(197,160,89,0.08); border:1px solid var(--gold-border);
+      border-left:3px solid var(--gold); border-radius:var(--radius,4px);
+      padding:13px 18px; gap:12px; align-items:flex-start;
+      animation:fadeUp 0.35s ease both;
+    }
+    .notif-banner[style*="flex"] { display:flex; }
+    .notif-banner i { color:var(--gold); font-size:14px; margin-top:2px; flex-shrink:0; }
+    .notif-banner p { font-size:12px; color:var(--ink-soft); line-height:1.6; font-weight:500; }
+
+    /* ── Bio ── */
+    .bio { width:100%; max-width:440px; text-align:center; margin-bottom:44px; }
+    .photo-wrap  { position:relative; width:144px; height:144px; margin:0 auto 26px; }
+    .photo-ring  { position:absolute; inset:-9px; border-radius:50%; border:1px solid transparent; border-top-color:var(--gold); border-right-color:var(--gold); animation:spin 8s linear infinite; }
+    .photo-ring-2{ position:absolute; inset:-16px; border-radius:50%; border:1px solid var(--gold-border); border-bottom-color:transparent; animation:spin 12s linear infinite reverse; }
+    .photo-wrap img { width:144px; height:144px; border-radius:50%; object-fit:cover; border:3px solid var(--gold); display:block; position:relative; z-index:1; }
+    .bio-eyebrow { font-family:'Cormorant Garamond',serif; font-size:10px; font-weight:300; letter-spacing:0.4em; color:var(--gold); text-transform:uppercase; margin-bottom:7px; animation:fadeUp 0.7s 0.1s both; }
+    .bio-name    { font-family:var(--font-serif,'Playfair Display',serif); font-size:26px; font-weight:600; color:var(--ink); line-height:1.25; margin-bottom:5px; animation:fadeUp 0.7s 0.15s both; }
+    html.dark .bio-name { color:#EAE2D8; }
+    .bio-oab     { font-family:'Jost',sans-serif; font-size:10px; font-weight:300; letter-spacing:0.22em; color:var(--ink-muted); text-transform:uppercase; margin-bottom:14px; animation:fadeUp 0.7s 0.2s both; }
+    .bio-desc    { font-family:'Cormorant Garamond',serif; font-size:15px; font-style:italic; font-weight:300; color:var(--ink-soft); line-height:1.75; margin-bottom:22px; animation:fadeUp 0.7s 0.25s both; }
+    .bio-line    { display:flex; align-items:center; gap:14px; max-width:160px; margin:0 auto 22px; animation:fadeUp 0.7s 0.3s both; }
+    .bio-line::before, .bio-line::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--gold-border)); }
+    .bio-line::after { background:linear-gradient(270deg,transparent,var(--gold-border)); }
+    .bio-line i  { color:var(--gold); font-size:9px; }
+    .bio-contacts { display:flex; justify-content:center; gap:10px; animation:fadeUp 0.7s 0.35s both; }
+    .contact-pill { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:rgba(255,255,255,0.65); backdrop-filter:blur(8px); border:1px solid var(--gold-border); border-radius:40px; font-family:'Jost',sans-serif; font-size:11px; letter-spacing:0.08em; color:var(--ink-soft); text-decoration:none; transition:all 0.3s; }
+    .contact-pill i { color:var(--gold); font-size:13px; }
+    .contact-pill:hover { background:var(--gold-dim); border-color:var(--gold); color:var(--ink); }
+
+    @keyframes fadeUp  { from{opacity:0;transform:translateY(18px);} to{opacity:1;transform:translateY(0);} }
+    @keyframes scaleIn { from{opacity:0;transform:scale(0.96);}     to{opacity:1;transform:scale(1);} }
+
+    /* ── Card busca ── */
+    .search-card { width:100%; max-width:440px; background:rgba(255,255,255,0.72); backdrop-filter:blur(20px); border:1px solid var(--gold-border); border-radius:var(--radius,4px); padding:38px 34px; position:relative; overflow:hidden; animation:fadeUp 0.7s 0.4s both; }
+    .search-card::before { content:''; position:absolute; top:0; left:16px; right:16px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+    .sc-eyebrow  { font-family:'Cormorant Garamond',serif; font-size:10px; letter-spacing:0.38em; color:var(--gold); text-transform:uppercase; text-align:center; margin-bottom:5px; }
+    .sc-title    { font-family:var(--font-serif,'Playfair Display',serif); font-size:19px; font-weight:400; color:var(--ink); text-align:center; margin-bottom:28px; }
+    .field       { margin-bottom:18px; }
+    .field label { display:block; font-size:9px; font-weight:500; letter-spacing:0.22em; color:var(--ink-muted); text-transform:uppercase; margin-bottom:8px; }
+    .field-inner { position:relative; }
+    .field-inner i { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--gold); font-size:12px; pointer-events:none; }
+    .field-inner input { width:100%; background:rgba(255,255,255,0.55); border:1px solid rgba(197,160,89,0.2); border-radius:var(--radius,4px); padding:12px 12px 12px 36px; font-family:'Jost',sans-serif; font-size:14px; color:var(--ink); outline:none; transition:border-color 0.3s,background 0.3s; }
+    .field-inner input:focus { border-color:var(--gold); background:rgba(255,255,255,0.9); }
+    .field-inner input::placeholder { color:var(--ink-muted); font-size:13px; }
+    .btn-primary { width:100%; padding:14px; background:linear-gradient(135deg,var(--gold) 0%,#A37E3B 100%); border:none; border-radius:var(--radius,4px); font-family:'Jost',sans-serif; font-size:10px; font-weight:500; letter-spacing:0.28em; color:white; text-transform:uppercase; cursor:pointer; transition:opacity 0.3s; }
+    .btn-primary:hover  { opacity:0.88; }
+    .btn-primary:active { transform:scale(0.99); }
+
+    /* ── Glossário btn ── */
+    .glossario-btn { background:none; border:none; cursor:pointer; color:var(--gold); opacity:0.6; font-size:12px; padding:2px 4px; transition:opacity 0.2s; vertical-align:middle; }
+    .glossario-btn:hover { opacity:1; }
+
+    /* ── Modais ── */
+    .overlay { position:fixed; inset:0; z-index:500; display:none; align-items:center; justify-content:center; padding:24px; background:rgba(28,25,23,0.55); backdrop-filter:blur(14px); }
+    .overlay[style*="flex"] { display:flex; }
+    .modal       { width:100%; max-width:370px; background:var(--cream); border:1px solid var(--gold-border); border-radius:var(--radius,4px); padding:38px 32px; position:relative; text-align:center; animation:scaleIn 0.25s ease; }
+    .modal::before { content:''; position:absolute; top:0; left:12px; right:12px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+    .modal-icon  { width:50px; height:50px; border:1px solid var(--gold-border); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
+    .modal-icon i { color:var(--gold); font-size:17px; }
+    .modal-title  { font-family:var(--font-serif,'Playfair Display',serif); font-size:19px; font-weight:400; color:var(--ink); margin-bottom:7px; }
+    .modal-sub    { font-family:'Cormorant Garamond',serif; font-size:14px; font-weight:300; font-style:italic; color:var(--ink-muted); line-height:1.6; margin-bottom:20px; }
+    .timer-pill   { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; background:var(--gold-dim); border:1px solid var(--gold-border); border-radius:20px; font-family:'Jost',sans-serif; font-size:11px; color:var(--gold); margin-bottom:20px; }
+    .otp-input    { width:100%; background:rgba(255,255,255,0.8); border:1px solid var(--gold-border); border-radius:var(--radius,4px); padding:15px; text-align:center; font-family:'Playfair Display',serif; font-size:26px; letter-spacing:0.5em; color:var(--ink); outline:none; margin-bottom:22px; transition:border-color 0.3s; }
+    .otp-input:focus { border-color:var(--gold); }
+    .modal-actions { display:flex; flex-direction:column; gap:8px; }
+    .modal-msg  { font-family:'Jost',sans-serif; font-size:13px; font-weight:300; color:var(--ink-soft); line-height:1.7; margin-bottom:26px; }
+    .btn-ghost  { width:100%; padding:11px; background:none; border:1px solid rgba(197,160,89,0.15); border-radius:var(--radius,4px); font-family:'Jost',sans-serif; font-size:10px; letter-spacing:0.15em; color:var(--ink-muted); text-transform:uppercase; cursor:pointer; transition:all 0.25s; }
+    .btn-ghost:hover { border-color:var(--gold-border); color:var(--ink-soft); }
+  </style>
+</head>
+<body>
+
+<div class="bg-deco"></div>
+<div class="bg-grid"></div>
+
+<!-- Loader -->
+<div id="globalLoader">
+  <div class="loader-wrap">
+    <div class="loader-ring"></div>
+    <span class="loader-label">Carregando</span>
+  </div>
+</div>
+
+<!-- Header -->
+<header>
+  <span class="hdr-brand">Advocacia</span>
+  <div class="hdr-actions">
+    <button id="installApp" class="hidden"><i class="fas fa-arrow-down-to-bracket"></i> Instalar App</button>
+    <button class="btn-theme" onclick="toggleDarkMode()"><i id="themeIcon" class="fas fa-moon"></i></button>
+  </div>
+</header>
+
+<main>
+
+  <!-- Banner primeiro acesso (admin) -->
+  <div class="primeiro-acesso-banner" id="primeiroAcessoBanner">
+    <i class="fas fa-circle-info"></i>
+    <p><strong>Configuração necessária</strong> — <span id="primeiroAcessoTexto"></span></p>
+  </div>
+
+  <!-- Banner notificação de processo -->
+  <div class="notif-banner" id="notifBanner">
+    <i class="fas fa-bell"></i>
+    <p id="notifBannerTexto"></p>
+  </div>
+
+  <!-- Bio -->
+  <section class="bio">
+    <div class="photo-wrap">
+      <div class="photo-ring"></div>
+      <div class="photo-ring-2"></div>
+      <img id="bio-img"
+        src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiGaEVTw5lfLFBN6DQyXlxRH5jYjaFoYWedjR0xPphZ31_Khb5h5IZcoGgFuUv4tYZtVaz7sZ-CiF7jZAYqot3DGcrvqZM9lcgnz-PQK4N9IkNJCJ6nPyRyd4R0ZpLoGpL1jqgG63NMVrcjVSvE-KXQIJ68ty0tNVRS3TC0-PUK1vAVPx28CfwZcmje1nhY/w424-h424/logo.png"
+        alt="Foto da Advogada">
+    </div>
+    <p class="bio-eyebrow">Advocacia &amp; Consultoria Jurídica</p>
+    <h1 class="bio-name" id="bio-name">Carregando...</h1>
+    <p class="bio-oab"  id="bio-oab">OAB/MS 000.000</p>
+    <p class="bio-desc" id="bio-desc">Sincronizando dados...</p>
+    <div class="bio-line"><i class="fas fa-diamond"></i></div>
+    <div class="bio-contacts">
+      <a id="bio-phone" href="#" target="_blank" class="contact-pill"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+      <a id="bio-email" href="#"                 class="contact-pill"><i class="fas fa-envelope"></i> E-mail</a>
+    </div>
+  </section>
+
+  <!-- Card de busca -->
+  <div class="search-card">
+    <p class="sc-eyebrow">Portal do Cliente</p>
+    <h2 class="sc-title">Consultar meu Processo</h2>
+    <div class="field">
+      <label>Identificação do Reclamante</label>
+      <div class="field-inner">
+        <i class="fas fa-at"></i>
+        <input type="email" id="searchCpf" autocomplete="username" placeholder="Seu endereço de e-mail">
+      </div>
+    </div>
+    <button class="btn-primary" id="btnSearch">Acessar Linha do Tempo</button>
+  </div>
+
+</main>
+
+<!-- Modal OTP -->
+<div id="modalCode" class="overlay">
+  <div class="modal">
+    <div class="modal-icon"><i class="fas fa-shield-halved"></i></div>
+    <h3 class="modal-title">Verificação</h3>
+    <p class="modal-sub">Insira o código de 6 dígitos<br>enviado ao seu e-mail.</p>
+    <div class="timer-pill"><i class="fas fa-clock"></i> Expira em: <strong id="timer">03:00</strong></div>
+    <input type="text" class="otp-input" id="inputOtp" maxlength="6" placeholder="000000"
+      onkeydown="if(event.key==='Enter') confirmCode()">
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="confirmCode()">Validar Acesso</button>
+      <button class="btn-ghost"   onclick="closeOtpModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Erro -->
+<div id="modalError" class="overlay">
+  <div class="modal">
+    <div class="modal-icon"><i class="fas fa-circle-info"></i></div>
+    <h3 class="modal-title">Aviso</h3>
+    <p class="modal-msg" id="errorMessage">Este e-mail não está autorizado.</p>
+    <button class="btn-primary" onclick="closeErrorModal()">Entendido</button>
+  </div>
+</div>
+
+<!--
+  ORDEM DE CARREGAMENTO IMPORTANTE:
+  1. tema.js — define URL_API, toggleDarkMode, carregarTemaEBio, aplica tema via IIFE
+  2. app.js  — usa URL_API e toggleDarkMode de tema.js, NÃO os redefine
+-->
+<script src="tema.js"></script>
+<script>
+  // Injetar modal do glossário após tema.js carregar
+  if (typeof getGlossarioModalHTML === 'function') {
+    document.body.insertAdjacentHTML('beforeend', getGlossarioModalHTML());
+  }
+</script>
+<script src="app.js"></script>
+</body>
+</html>
