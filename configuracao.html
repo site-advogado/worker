@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' https://blogger.googleusercontent.com data:; connect-src 'self' https://*.workers.dev;">
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Advocacia">
+  <link rel="apple-touch-icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhHtE2js3Aj9ZLxGzW-qg0iuRkcQvHrLMREwdxYyxwFQZ9IoEp_lYYjezzImcmSIoIPT0GDbAKn0HgZY757h6ob0P-RArslGJ8ca8R395S1oruz8a0R_BXc9OMWQwpqodGTFwq3rNdhshjmU9GgIvaBNAr7JmvgrH6GpbbxqgPXHy_42z9P43RM4frkdlc/w494-h494/logo.png">
+  <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhHtE2js3Aj9ZLxGzW-qg0iuRkcQvHrLMREwdxYyxwFQZ9IoEp_lYYjezzImcmSIoIPT0GDbAKn0HgZY757h6ob0P-RArslGJ8ca8R395S1oruz8a0R_BXc9OMWQwpqodGTFwq3rNdhshjmU9GgIvaBNAr7JmvgrH6GpbbxqgPXHy_42z9P43RM4frkdlc/w494-h494/logo.png">
+  <title>Painel de Gestão | Gestão Processual</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          navy:      '#0A1628',
+          navyMid:   '#111E35',
+          navyLight: '#1C2D4A',
+          steel:     '#2E6DA4',
+          steelLight:'#4A8DC4',
+          steelDim:  '#1A4A72',
+          iceWhite:  '#E8EDF4',
+          silverFog: '#9AADC4',
+          gunmetal:  '#2C3344',
+        },
+        fontFamily: {
+          serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+          sans:  ['Inter', 'sans-serif'],
+        }
+      }
+    }
+  }
+
+  if (localStorage.getItem('ADV_GLOBAL_THEME') === 'dark') {
+    document.documentElement.classList.add('dark');
+    document.documentElement.classList.remove('light');
+  } else {
+    document.documentElement.classList.add('light');
+    document.documentElement.classList.remove('dark');
+  }
+  </script>
+
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F0F4F8;
+      background-image:
+        linear-gradient(rgba(46,109,164,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(46,109,164,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      color: #0A1628;
+      min-height: 100vh;
+      -webkit-user-select: none;
+      user-select: none;
+      transition: background 0.4s, color 0.4s;
+    }
+    html.dark body {
+      background-color: #0A1628;
+      background-image:
+        linear-gradient(rgba(46,109,164,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(46,109,164,0.08) 1px, transparent 1px);
+      background-size: 48px 48px;
+      color: #E8EDF4;
+    }
+    input, select, textarea {
+      -webkit-user-select: text !important;
+      user-select: text !important;
+    }
+    img { pointer-events: none; -webkit-user-drag: none; }
+
+    /* ── Header ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 12px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(240, 244, 248, 0.88);
+      border-bottom: 1px solid rgba(46,109,164,0.18);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    html.dark header {
+      background: rgba(10, 22, 40, 0.92);
+      border-bottom-color: rgba(46,109,164,0.25);
+    }
+
+    /* ── Loader ── */
+    #globalLoader {
+      position: fixed; inset: 0; z-index: 9999;
+      display: none; align-items: center; justify-content: center;
+      background: rgba(240,244,248,0.92);
+      backdrop-filter: blur(10px);
+    }
+    #globalLoader.show { display: flex; }
+    html.dark #globalLoader { background: rgba(10,22,40,0.92); }
+    .loader {
+      border: 3px solid rgba(46,109,164,0.15);
+      border-top: 3px solid #2E6DA4;
+      border-radius: 50%;
+      width: 38px; height: 38px;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+
+    /* ── Main ── */
+    main {
+      position: relative; z-index: 1;
+      padding: 80px 20px 60px;
+      max-width: 860px; margin: 0 auto;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: #2E6DA4; opacity: 0.75;
+    }
+    html.dark .section-label { color: #4A8DC4; }
+
+    /* ── Dashboard ── */
+    .dash-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 12px; margin-bottom: 24px;
+    }
+    @media(max-width:520px) {
+      .dash-grid { grid-template-columns: 1fr 1fr; }
+      .dash-grid .dash-card:last-child { grid-column: 1 / -1; }
+    }
+    .dash-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(46,109,164,0.12);
+      border-radius: 14px; padding: 18px;
+      position: relative; overflow: hidden;
+      box-shadow: 0 2px 16px rgba(10,22,40,0.07);
+    }
+    html.dark .dash-card {
+      background: #111E35;
+      border-color: rgba(46,109,164,0.20);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+    .dash-card::before {
+      content: ''; position: absolute; top: 0; left: 10px; right: 10px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(46,109,164,0.3), transparent);
+    }
+    .dash-label {
+      font-size: 9px; font-weight: 600; letter-spacing: 0.2em;
+      color: #2E6DA4; text-transform: uppercase; margin-bottom: 8px;
+      opacity: 0.8;
+    }
+    html.dark .dash-label { color: #4A8DC4; }
+    .dash-value {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 30px; font-weight: 700; color: #0A1628; line-height: 1;
+    }
+    html.dark .dash-value { color: #E8EDF4; }
+    .dash-sub { font-size: 10px; color: #9AADC4; margin-top: 5px; }
+
+    /* ── Tabs ── */
+    .tab-pill {
+      display: flex;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(46,109,164,0.14);
+      border-radius: 12px; padding: 4px;
+      margin-bottom: 24px; gap: 4px; flex-wrap: wrap;
+      box-shadow: 0 2px 12px rgba(10,22,40,0.05);
+    }
+    html.dark .tab-pill {
+      background: rgba(17,30,53,0.95);
+      border-color: rgba(46,109,164,0.22);
+    }
+    .tab-btn {
+      flex: 1; min-width: 80px;
+      padding: 10px 8px; border: none; border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: 10px;
+      font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+      cursor: pointer; background: none; color: #9AADC4;
+      transition: all 0.25s;
+    }
+    html.dark .tab-btn { color: #6A82A0; }
+    .tab-btn.active {
+      background: rgba(46,109,164,0.12);
+      color: #2E6DA4;
+      box-shadow: inset 0 0 0 1px rgba(46,109,164,0.2);
+    }
+    html.dark .tab-btn.active { color: #4A8DC4; background: rgba(46,109,164,0.18); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── Card ── */
+    .card {
+      background: #FFFFFF;
+      border: 1px solid rgba(46,109,164,0.12);
+      border-radius: 16px; padding: 24px;
+      position: relative; overflow: hidden; margin-bottom: 20px;
+      box-shadow: 0 2px 20px rgba(10,22,40,0.07);
+    }
+    html.dark .card {
+      background: #111E35;
+      border-color: rgba(46,109,164,0.20);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 14px; right: 14px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(46,109,164,0.25), transparent);
+    }
+    /* Decorative corners on cards */
+    .card::after {
+      content: ''; position: absolute; bottom: 14px; right: 14px;
+      width: 16px; height: 16px;
+      border-bottom: 1.5px solid rgba(46,109,164,0.2);
+      border-right: 1.5px solid rgba(46,109,164,0.2);
+    }
+
+    .card-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
+      color: #2E6DA4; text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex; align-items: center; gap: 8px;
+      opacity: 0.8;
+    }
+    html.dark .card-title { color: #4A8DC4; }
+    .card-title::after {
+      content: ''; flex: 1; height: 1px;
+      background: rgba(46,109,164,0.12);
+    }
+    html.dark .card-title::after { background: rgba(74,141,196,0.12); }
+
+    /* ── Security card ── */
+    .security-card {
+      background: rgba(46,130,100,0.05);
+      border: 1px solid rgba(46,130,100,0.2);
+      border-radius: 16px; padding: 20px; margin-bottom: 20px;
+      position: relative; overflow: hidden;
+    }
+    html.dark .security-card {
+      background: rgba(46,130,100,0.08);
+      border-color: rgba(58,158,114,0.2);
+    }
+    .security-card::before {
+      content: ''; position: absolute; top: 0; left: 14px; right: 14px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(46,130,100,0.25), transparent);
+    }
+    .security-card .card-title { color: #3A9E72; }
+    html.dark .security-card .card-title { color: #5DC898; }
+    .security-card .card-title::after { background: rgba(46,130,100,0.15); }
+    .security-note-row {
+      display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;
+    }
+    .security-note-row:last-child { margin-bottom: 0; }
+    .security-note-row i { color: #3A9E72; font-size: 12px; margin-top: 2px; flex-shrink: 0; }
+    html.dark .security-note-row i { color: #5DC898; }
+    .security-note-row p {
+      font-size: 12px; color: #3A9E72; line-height: 1.55; font-weight: 400;
+    }
+    html.dark .security-note-row p { color: #5DC898; opacity: 0.85; }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      align-items: center; margin-bottom: 20px;
+    }
+    .search-wrap { position: relative; flex: 1; min-width: 180px; }
+    .search-wrap i {
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%); color: rgba(46,109,164,0.55); font-size: 12px;
+    }
+    .field-el {
+      width: 100%;
+      background: #FFFFFF;
+      border: 1px solid rgba(46,109,164,0.18);
+      border-radius: 10px;
+      padding: 10px 10px 10px 36px;
+      font-family: 'Inter', sans-serif; font-size: 13px;
+      color: #0A1628; outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .field-el:focus {
+      border-color: #2E6DA4;
+      box-shadow: 0 0 0 3px rgba(46,109,164,0.10);
+    }
+    .field-el::placeholder { color: #9AADC4; font-size: 12px; }
+    select.field-el { padding-left: 10px; cursor: pointer; }
+    html.dark .field-el {
+      background: #1C2D4A; color: #E8EDF4;
+      border-color: rgba(46,109,164,0.25);
+    }
+    html.dark .field-el::placeholder { color: #6A82A0; }
+
+    /* ── Btn novo ── */
+    .btn-novo {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #2E6DA4, #1A4A72);
+      border: none; border-radius: 10px;
+      font-family: 'Inter', sans-serif; font-size: 10px;
+      font-weight: 600; letter-spacing: 0.18em; color: #fff;
+      text-transform: uppercase; cursor: pointer;
+      white-space: nowrap;
+      display: flex; align-items: center; gap: 7px;
+      position: relative; overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-novo::before {
+      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+      transition: left 0.5s ease;
+    }
+    .btn-novo:hover::before { left: 100%; }
+    .btn-novo:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(46,109,164,0.35); }
+
+    /* ── Cliente card ── */
+    #clientList { display: flex; flex-direction: column; gap: 10px; }
+    .client-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(46,109,164,0.12);
+      border-radius: 14px; padding: 16px 18px;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      transition: border-color 0.25s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 12px rgba(10,22,40,0.06);
+    }
+    html.dark .client-card {
+      background: #111E35;
+      border-color: rgba(46,109,164,0.16);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+    }
+    .client-card:hover {
+      border-color: rgba(46,109,164,0.4);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(46,109,164,0.12);
+    }
+    .cc-info { flex: 1; min-width: 0; }
+    .cc-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 16px; font-weight: 600; color: #0A1628; margin-bottom: 4px;
+      letter-spacing: 0.01em;
+    }
+    html.dark .cc-name { color: #E8EDF4; }
+    .cc-meta { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+    .cc-badge {
+      font-size: 9px; font-weight: 600; letter-spacing: 0.12em;
+      padding: 2px 8px; border-radius: 4px; text-transform: uppercase;
+    }
+    .cc-badge.tipo      { background: rgba(46,109,164,0.08); color: #2E6DA4; border: 1px solid rgba(46,109,164,0.2); }
+    .cc-badge.pendente  { background: rgba(46,109,164,0.1);  color: #2E6DA4; border: 1px solid rgba(46,109,164,0.25); }
+    .cc-badge.lido      { background: rgba(46,130,100,0.08); color: #3A9E72; border: 1px solid rgba(46,130,100,0.2); }
+    .cc-badge.finalizado{ background: rgba(100,100,120,0.07); color: #9AADC4; border: 1px solid rgba(100,100,120,0.14); }
+    html.dark .cc-badge.tipo    { color: #4A8DC4; border-color: rgba(74,141,196,0.25); }
+    html.dark .cc-badge.pendente{ color: #4A8DC4; border-color: rgba(74,141,196,0.3);  }
+    html.dark .cc-badge.lido    { color: #5DC898; border-color: rgba(58,158,114,0.25); }
+    .cc-status { font-size: 10px; color: #9AADC4; margin-top: 5px; }
+    .cc-acesso { font-size: 9px; color: #9AADC4; opacity: 0.6; }
+    .cc-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .act-btn {
+      width: 34px; height: 34px; border-radius: 8px;
+      border: 1px solid rgba(46,109,164,0.2);
+      background: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #2E6DA4; font-size: 12px; transition: all 0.2s;
+    }
+    .act-btn:hover { background: rgba(46,109,164,0.08); border-color: rgba(46,109,164,0.4); }
+    html.dark .act-btn { color: #4A8DC4; border-color: rgba(74,141,196,0.22); }
+    .act-btn.del { border-color: rgba(192,74,58,0.22); color: #C04A3A; }
+    .act-btn.del:hover { background: rgba(192,74,58,0.08); border-color: rgba(192,74,58,0.45); }
+    html.dark .act-btn.del { color: #E07060; }
+
+    /* ── Profile form ── */
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width:520px) { .profile-grid { grid-template-columns: 1fr; } }
+    .field-group { display: flex; flex-direction: column; gap: 5px; }
+    .field-group.wide { grid-column: 1 / -1; }
+    .field-label {
+      font-size: 9px; font-weight: 600; letter-spacing: 0.2em;
+      color: #9AADC4; text-transform: uppercase;
+    }
+    html.dark .field-label { color: #6A82A0; }
+    .field-input {
+      background: #FFFFFF;
+      border: 1px solid rgba(46,109,164,0.18);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 400;
+      color: #0A1628; outline: none; width: 100%;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .field-input:focus {
+      border-color: #2E6DA4;
+      box-shadow: 0 0 0 3px rgba(46,109,164,0.10);
+    }
+    .field-input::placeholder { color: #9AADC4; }
+    textarea.field-input { resize: vertical; min-height: 80px; }
+    html.dark .field-input {
+      background: #1C2D4A; color: #E8EDF4;
+      border-color: rgba(46,109,164,0.22);
+    }
+    html.dark .field-input::placeholder { color: #6A82A0; }
+    html.dark .field-input:focus { border-color: #4A8DC4; }
+
+    /* ── Areas grid ── */
+    .areas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .area-check {
+      display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+      border: 1px solid rgba(46,109,164,0.12);
+      border-radius: 8px; cursor: pointer;
+      font-size: 11px; color: #44556A;
+      transition: all 0.2s;
+    }
+    .area-check:hover { border-color: rgba(46,109,164,0.35); background: rgba(46,109,164,0.04); }
+    .area-check input { accent-color: #2E6DA4; }
+    html.dark .area-check { color: #9AADC4; border-color: rgba(74,141,196,0.12); }
+    html.dark .area-check:hover { border-color: rgba(74,141,196,0.35); background: rgba(46,109,164,0.08); }
+
+    /* ── Password field with toggle ── */
+    .pass-wrap { position: relative; }
+    .pass-wrap .field-input { padding-right: 42px; }
+    .pass-toggle {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: rgba(46,109,164,0.4); font-size: 12px; transition: color 0.2s;
+    }
+    .pass-toggle:hover { color: #2E6DA4; }
+    html.dark .pass-toggle { color: rgba(74,141,196,0.45); }
+    html.dark .pass-toggle:hover { color: #4A8DC4; }
+
+    /* ── Strength bar ── */
+    .strength-bar-bg {
+      height: 3px; background: rgba(46,109,164,0.10);
+      border-radius: 2px; overflow: hidden; margin-top: 6px;
+    }
+    .strength-fill { height: 100%; border-radius: 2px; width: 0%; transition: width 0.35s ease, background 0.35s ease; }
+
+    /* ── Section divider ── */
+    .section-divider { height: 1px; background: rgba(46,109,164,0.10); margin: 20px 0; }
+    html.dark .section-divider { background: rgba(74,141,196,0.10); }
+
+    /* ── Buttons ── */
+    .btn-save {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #2E6DA4, #1A4A72);
+      border: none; border-radius: 12px;
+      font-family: 'Inter', sans-serif; font-size: 10px;
+      font-weight: 600; letter-spacing: 0.2em; color: #fff;
+      text-transform: uppercase; cursor: pointer; margin-top: 10px;
+      position: relative; overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-save::before {
+      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+      transition: left 0.5s ease;
+    }
+    .btn-save:hover::before { left: 100%; }
+    .btn-save:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(46,109,164,0.35); }
+
+    .btn-save-sec {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #3A7A5A, #1E5038);
+      border: none; border-radius: 12px;
+      font-family: 'Inter', sans-serif; font-size: 10px;
+      font-weight: 600; letter-spacing: 0.2em; color: #fff;
+      text-transform: uppercase; cursor: pointer; margin-top: 10px;
+      position: relative; overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-save-sec:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(46,130,100,0.3); }
+
+    /* ── Msg inline ── */
+    .msg-inline {
+      display: none; align-items: center; gap: 9px;
+      padding: 10px 14px; border-radius: 8px;
+      margin-top: 10px; font-size: 12px;
+    }
+    .msg-inline.show { display: flex; }
+    .msg-inline.error   { background: rgba(192,74,58,0.08); color: #C04A3A; border: 1px solid rgba(192,74,58,0.2); }
+    .msg-inline.success { background: rgba(46,130,100,0.08); color: #3A9E72; border: 1px solid rgba(46,130,100,0.2); }
+    .msg-inline i { font-size: 12px; flex-shrink: 0; }
+    html.dark .msg-inline.error { background: rgba(192,74,58,0.12); color: #E07060; }
+    html.dark .msg-inline.success { background: rgba(46,130,100,0.12); color: #5DC898; }
+
+    /* ── Overlays / Modals ── */
+    .overlay {
+      position: fixed; inset: 0; z-index: 500;
+      display: none; align-items: flex-start; justify-content: center;
+      padding: 20px;
+      background: rgba(10,22,40,0.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow-y: auto;
+    }
+    .overlay.show { display: flex; }
+    .modal-wrap {
+      background: #FFFFFF;
+      border: 1px solid rgba(46,109,164,0.18);
+      border-radius: 18px; width: 100%; max-width: 560px;
+      padding: 0; position: relative; margin: auto;
+      animation: scaleIn 0.25s ease;
+      box-shadow: 0 20px 60px rgba(10,22,40,0.2);
+      overflow: hidden;
+    }
+    html.dark .modal-wrap {
+      background: #111E35;
+      border-color: rgba(46,109,164,0.25);
+    }
+    /* Top accent bar */
+    .modal-wrap::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, #1A4A72, #2E6DA4, #1A4A72);
+    }
+    .modal-inner { padding: 28px; }
+    @keyframes scaleIn { from{opacity:0;transform:scale(0.97);} to{opacity:1;transform:scale(1);} }
+
+    .modal-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 20px; font-weight: 600; color: #0A1628;
+      margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      letter-spacing: 0.02em;
+    }
+    html.dark .modal-title { color: #E8EDF4; }
+    .modal-close {
+      background: none; border: none; cursor: pointer;
+      color: #9AADC4; font-size: 14px; transition: color 0.2s;
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; border: 1px solid transparent;
+    }
+    .modal-close:hover { color: #2E6DA4; border-color: rgba(46,109,164,0.2); }
+    html.dark .modal-close:hover { color: #4A8DC4; }
+
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width:480px) { .modal-grid { grid-template-columns: 1fr; } }
+    .modal-grid .wide { grid-column: 1 / -1; }
+    .m-field { display: flex; flex-direction: column; gap: 5px; }
+    .m-label {
+      font-size: 9px; font-weight: 600; letter-spacing: 0.2em;
+      color: #9AADC4; text-transform: uppercase;
+    }
+    html.dark .m-label { color: #6A82A0; }
+    .m-input {
+      background: #F0F4F8;
+      border: 1px solid rgba(46,109,164,0.18);
+      border-radius: 10px; padding: 10px 12px;
+      font-family: 'Inter', sans-serif; font-size: 13px;
+      color: #0A1628; outline: none; width: 100%;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .m-input:focus {
+      border-color: #2E6DA4;
+      box-shadow: 0 0 0 3px rgba(46,109,164,0.10);
+      background: #FFFFFF;
+    }
+    html.dark .m-input {
+      background: #1C2D4A; color: #E8EDF4;
+      border-color: rgba(46,109,164,0.22);
+    }
+    html.dark .m-input:focus { border-color: #4A8DC4; background: #1C2D4A; }
+    .m-check {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: #44556A; cursor: pointer;
+    }
+    .m-check input { accent-color: #2E6DA4; }
+    html.dark .m-check { color: #9AADC4; }
+
+    .obs-note { font-size: 10px; color: #9AADC4; margin-top: 3px; }
+    html.dark .obs-note { color: #6A82A0; }
+
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-cancel {
+      flex: 1; padding: 12px; background: none;
+      border: 1px solid rgba(46,109,164,0.2);
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif; font-size: 10px;
+      font-weight: 600; letter-spacing: 0.15em;
+      color: #9AADC4; text-transform: uppercase; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-cancel:hover { border-color: rgba(46,109,164,0.4); color: #2E6DA4; }
+    html.dark .btn-cancel:hover { color: #4A8DC4; }
+    .btn-confirm {
+      flex: 2; padding: 12px;
+      background: linear-gradient(135deg, #2E6DA4, #1A4A72);
+      border: none; border-radius: 10px;
+      font-family: 'Inter', sans-serif; font-size: 10px;
+      font-weight: 600; letter-spacing: 0.18em; color: #fff;
+      text-transform: uppercase; cursor: pointer;
+      position: relative; overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-confirm::before {
+      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+      transition: left 0.5s ease;
+    }
+    .btn-confirm:hover::before { left: 100%; }
+    .btn-confirm:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(46,109,164,0.35); }
+
+    /* ── Confirm / delete modals ── */
+    .confirm-modal { max-width: 360px; text-align: center; }
+    .confirm-modal .modal-inner { padding: 32px 28px; }
+    .confirm-icon {
+      width: 50px; height: 50px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px; font-size: 18px;
+    }
+    .confirm-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 19px; font-weight: 600; color: #0A1628; margin-bottom: 8px;
+    }
+    html.dark .confirm-title { color: #E8EDF4; }
+    .confirm-sub {
+      font-size: 13px; color: #9AADC4; line-height: 1.6;
+      margin-bottom: 24px; font-weight: 300;
+    }
+
+    /* ── Notif box inside modal ── */
+    .notif-box {
+      background: rgba(46,109,164,0.05);
+      border: 1px solid rgba(46,109,164,0.14);
+      border-radius: 10px; padding: 14px;
+    }
+    html.dark .notif-box {
+      background: rgba(46,109,164,0.10);
+      border-color: rgba(74,141,196,0.18);
+    }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      background: #0A1628;
+      border: 1px solid rgba(46,109,164,0.3);
+      border-radius: 12px; padding: 12px 18px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: #E8EDF4;
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+      pointer-events: none;
+      box-shadow: 0 8px 32px rgba(10,22,40,0.4);
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast i { color: #4A8DC4; }
+
+    /* ── Btn sair ── */
+    .btn-sair {
+      padding: 7px 16px; background: none;
+      border: 1px solid rgba(192,74,58,0.3);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: 10px;
+      font-weight: 600; letter-spacing: 0.14em; color: #C04A3A;
+      cursor: pointer; text-transform: uppercase; transition: all 0.25s;
+    }
+    .btn-sair:hover { background: rgba(192,74,58,0.08); border-color: rgba(192,74,58,0.5); }
+    html.dark .btn-sair { color: #E07060; border-color: rgba(224,112,96,0.3); }
+
+    /* ── Animations ── */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:translateY(0);} }
+    .fade-up { animation: fadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(46,109,164,0.25); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(46,109,164,0.45); }
+  </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+
+<!-- ── Global Loader ── -->
+<div id="globalLoader">
+  <div style="background:#fff;border:1px solid rgba(46,109,164,0.18);border-radius:20px;padding:32px 40px;display:flex;flex-direction:column;align-items:center;box-shadow:0 8px 40px rgba(10,22,40,0.12);">
+    <div class="loader"></div>
+    <p style="font-family:'Inter',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:#2E6DA4;margin-top:14px;">Carregando</p>
+  </div>
+</div>
+html.dark #globalLoader > div { background: #111E35 !important; }
+
+<!-- ── Header ── -->
+<header>
+  <!-- Brand -->
+  <div style="display:flex;align-items:center;gap:10px;opacity:0.85;">
+    <div style="width:20px;height:20px;border:2px solid rgba(46,109,164,0.5);transform:rotate(45deg);display:flex;align-items:center;justify-content:center;">
+      <div style="width:6px;height:6px;background:#2E6DA4;"></div>
+    </div>
+    <span style="font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:rgba(46,109,164,0.7);">Painel de Gestão</span>
+  </div>
+
+  <!-- Actions -->
+  <div style="display:flex;align-items:center;gap:8px;">
+    <button class="btn-sair" onclick="logout()">
+      <i class="fas fa-right-from-bracket" style="margin-right:5px;font-size:9px;"></i>Sair
+    </button>
+  </div>
+</header>
+
+<main class="fade-up">
+
+  <!-- ── Dashboard ── -->
+  <div class="dash-grid">
+    <div class="dash-card">
+      <div class="dash-label">Em andamento</div>
+      <div class="dash-value" id="dAndamento">—</div>
+      <div class="dash-sub">processos ativos</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-label">Finalizados</div>
+      <div class="dash-value" id="dFinalizado">—</div>
+      <div class="dash-sub">arquivados</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-label">Notificações</div>
+      <div class="dash-value" id="dPendente">—</div>
+      <div class="dash-sub">pendentes de leitura</div>
+    </div>
+  </div>
+
+  <!-- ── Tabs ── -->
+  <div class="tab-pill">
+    <button class="tab-btn active" onclick="switchTab('clientes')">
+      <i class="fas fa-users" style="margin-right:5px;font-size:9px;"></i>Clientes
+    </button>
+    <button class="tab-btn" onclick="switchTab('perfil')">
+      <i class="fas fa-user-tie" style="margin-right:5px;font-size:9px;"></i>Perfil Público
+    </button>
+    <button class="tab-btn" onclick="switchTab('credenciais')">
+      <i class="fas fa-shield-halved" style="margin-right:5px;font-size:9px;"></i>Credenciais
+    </button>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       TAB: CLIENTES
+  ════════════════════════════════════════ -->
+  <div id="tab-clientes" class="tab-content active">
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" class="field-el" id="filtroNome"
+               placeholder="Buscar por nome..."
+               oninput="renderClientes()">
+      </div>
+      <select class="field-el" id="filtroStatus" onchange="renderClientes()"
+              style="width:auto;padding-left:10px;min-width:150px;">
+        <option value="">Todos os status</option>
+        <option>Petição Inicial Protocolada</option>
+        <option>Aguardando Citação</option>
+        <option>Audiência de Conciliação Designada</option>
+        <option>Audiência de Instrução e Julgamento</option>
+        <option>Sentença Proferida</option>
+        <option>Fase de Execução / Cálculos</option>
+        <option>Processo Finalizado / Arquivado</option>
+      </select>
+      <select class="field-el" id="filtroTipo" onchange="renderClientes()"
+              style="width:auto;padding-left:10px;min-width:150px;">
+        <option value="">Todos os tipos</option>
+      </select>
+      <button class="btn-novo" onclick="abrirModalNovo()">
+        <i class="fas fa-user-plus"></i> Novo Cliente
+      </button>
+    </div>
+    <div id="clientList"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       TAB: PERFIL PÚBLICO
+  ════════════════════════════════════════ -->
+  <div id="tab-perfil" class="tab-content">
+    <div class="card">
+      <div class="card-title"><i class="fas fa-scale-balanced"></i> Áreas de Atuação</div>
+      <div class="areas-grid" id="areasGrid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="fas fa-user-tie"></i> Informações do Consultório</div>
+      <p style="font-size:11px;color:#9AADC4;margin-bottom:18px;font-weight:300;line-height:1.6;">
+        Estes dados aparecem na página inicial para todos os visitantes. Não incluem e-mail ou senha de acesso.
+      </p>
+      <div class="profile-grid">
+        <div class="field-group">
+          <div class="field-label">Nome Profissional</div>
+          <input type="text" class="field-input" id="cfgName">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Registro OAB</div>
+          <input type="text" class="field-input" id="cfgOab" oninput="maskOAB(this)" placeholder="OAB/XX 000.000">
+        </div>
+        <div class="field-group">
+          <div class="field-label">URL da Foto</div>
+          <input type="text" class="field-input" id="cfgImg" placeholder="https://...">
+        </div>
+        <div class="field-group">
+          <div class="field-label">WhatsApp</div>
+          <input type="text" class="field-input" id="cfgPhone" oninput="maskPhone(this)" placeholder="(00) 00000-0000">
+        </div>
+        <div class="field-group wide">
+          <div class="field-label">Breve Biografia</div>
+          <textarea class="field-input" id="cfgDesc"></textarea>
+        </div>
+      </div>
+      <button class="btn-save" onclick="salvarPerfil()">
+        <i class="fas fa-floppy-disk" style="margin-right:8px;opacity:0.8;"></i>Salvar Perfil Público
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       TAB: CREDENCIAIS
+  ════════════════════════════════════════ -->
+  <div id="tab-credenciais" class="tab-content">
+
+    <!-- Badge de segurança -->
+    <div class="security-card">
+      <div class="card-title"><i class="fas fa-shield-halved"></i> Segurança das Credenciais</div>
+      <div class="security-note-row">
+        <i class="fas fa-lock"></i>
+        <p>Seus dados de acesso são armazenados com <strong>criptografia AES-256-GCM</strong> no Cloudflare KV. Nenhuma informação sensível fica visível na planilha.</p>
+      </div>
+      <div class="security-note-row">
+        <i class="fas fa-key"></i>
+        <p>A senha é armazenada como <strong>hash SHA-256 com salt único</strong>. Nem o servidor conhece sua senha em texto puro.</p>
+      </div>
+      <div class="security-note-row">
+        <i class="fas fa-eye-slash"></i>
+        <p>Deixe os campos vazios para manter os valores atuais. Preencha apenas o que deseja alterar.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="fas fa-at"></i> Alterar E-mail de Acesso</div>
+      <div class="field-group">
+        <div class="field-label">Novo E-mail Administrativo</div>
+        <input type="email" class="field-input" id="credEmail" autocomplete="email"
+               placeholder="Deixe vazio para manter o atual">
+      </div>
+      <div class="msg-inline" id="msgEmail"><i></i><span></span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="fas fa-lock"></i> Alterar Senha de Acesso</div>
+      <div class="profile-grid">
+        <div class="field-group">
+          <div class="field-label">Nova Senha</div>
+          <div class="pass-wrap">
+            <input type="password" class="field-input" id="credSenha" autocomplete="new-password"
+                   placeholder="Mínimo 8 caracteres" oninput="avaliarForcaCred(this.value)">
+            <button class="pass-toggle" type="button" onclick="togglePassCred('credSenha',this)">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <div class="strength-bar-bg">
+            <div class="strength-fill" id="credStrFill"></div>
+          </div>
+          <div style="font-size:10px;color:#9AADC4;margin-top:4px;font-weight:400;" id="credStrLabel"></div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Confirmar Nova Senha</div>
+          <div class="pass-wrap">
+            <input type="password" class="field-input" id="credSenhaConf" autocomplete="new-password"
+                   placeholder="Repita a nova senha">
+            <button class="pass-toggle" type="button" onclick="togglePassCred('credSenhaConf',this)">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="msg-inline" id="msgSenha"><i></i><span></span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="fas fa-key"></i> Alterar Palavra-chave Secreta</div>
+      <div class="field-group">
+        <div class="field-label">Nova Palavra-chave</div>
+        <div class="pass-wrap">
+          <input type="text" class="field-input" id="credPalavra" autocomplete="off"
+                 placeholder="Deixe vazio para manter a atual">
+          <button class="pass-toggle" type="button" onclick="togglePassCred('credPalavra',this)">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        <p style="font-size:10px;color:#9AADC4;margin-top:8px;font-weight:300;line-height:1.55;">
+          Esta palavra, digitada no campo de busca da página inicial, abre silenciosamente o painel administrativo.
+        </p>
+      </div>
+      <div class="msg-inline" id="msgPalavra"><i></i><span></span></div>
+    </div>
+
+    <button class="btn-save-sec" onclick="salvarCredenciais()">
+      <i class="fas fa-shield-halved" style="margin-right:8px;opacity:0.9;"></i>
+      Salvar Credenciais com Criptografia
+    </button>
+
+  </div>
+
+  <!-- Footer -->
+  <p style="text-align:center;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;opacity:0.2;margin-top:32px;font-weight:600;">
+    Sistema Confidencial &mdash; Acesso Restrito
+  </p>
+
+</main>
+
+<!-- ══════════════════════════════════════════════════════════
+     Modal: Novo / Editar Cliente
+══════════════════════════════════════════════════════════ -->
+<div class="overlay" id="modalCliente">
+  <div class="modal-wrap">
+    <div class="modal-inner">
+      <div class="modal-title">
+        <span id="modalClienteTitulo">Novo Cliente</span>
+        <button class="modal-close" onclick="fecharModal('modalCliente')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Divider -->
+      <div style="width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(46,109,164,0.2),transparent);margin-bottom:20px;"></div>
+
+      <div class="modal-grid">
+        <div class="m-field">
+          <div class="m-label">Nome do Reclamante</div>
+          <input type="text" class="m-input" id="mNome">
+        </div>
+        <div class="m-field">
+          <div class="m-label">E-mail para Login</div>
+          <input type="email" class="m-input" id="mEmail">
+        </div>
+        <div class="m-field">
+          <div class="m-label">Tipo de Ação</div>
+          <select class="m-input" id="mTipo"></select>
+        </div>
+        <div class="m-field">
+          <div class="m-label">N. Processo</div>
+          <input type="text" class="m-input" id="mNumProc" oninput="maskProcess(this)"
+                 placeholder="0000000-00.0000.0.00.0000">
+        </div>
+        <div class="m-field">
+          <div class="m-label">Fase Atual</div>
+          <select class="m-input" id="mFase">
+            <option value="10">Petição Inicial (10%)</option>
+            <option value="30">Fase de Conhecimento (30%)</option>
+            <option value="60">Sentença / Recursos (60%)</option>
+            <option value="90">Execução / Cálculos (90%)</option>
+            <option value="100">Finalizado (100%)</option>
+          </select>
+        </div>
+        <div class="m-field">
+          <div class="m-label">Status Inicial / Atual</div>
+          <select class="m-input" id="mStatus">
+            <option>Petição Inicial Protocolada</option>
+            <option>Aguardando Citação</option>
+            <option>Audiência de Conciliação Designada</option>
+            <option>Audiência de Instrução e Julgamento</option>
+            <option>Sentença Proferida</option>
+            <option>Fase de Execução / Cálculos</option>
+            <option>Processo Finalizado / Arquivado</option>
+          </select>
+        </div>
+        <div class="m-field wide">
+          <div class="m-label">Descrição / Andamento</div>
+          <textarea class="m-input" id="mDesc" style="min-height:65px;resize:vertical;"></textarea>
+        </div>
+
+        <!-- Notificação box -->
+        <div class="m-field wide">
+          <div class="notif-box">
+            <div class="m-label" style="margin-bottom:10px;">
+              <i class="fas fa-bell" style="margin-right:5px;opacity:0.7;"></i>Notificação
+            </div>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;">
+              <label class="m-check"><input type="checkbox" id="mNotifAtiva"> Ativar aviso de novidade</label>
+              <label class="m-check"><input type="checkbox" id="mNotificar" checked> Notificar por e-mail</label>
+              <label class="m-check" id="novoCardWrap" style="display:none;">
+                <input type="checkbox" id="mNovoCard"> Novo card na timeline
+              </label>
+            </div>
+            <input type="text" class="m-input" id="mNotifMsg"
+                   placeholder="Mensagem personalizada (opcional)">
+            <div class="obs-note" style="margin-top:6px;">
+              Deixe vazio para usar mensagem genérica. O cliente só vê que há uma novidade.
+            </div>
+          </div>
+        </div>
+
+        <div class="m-field">
+          <div class="m-label">Observação Pública</div>
+          <input type="text" class="m-input" id="mObs" placeholder="Visível ao cliente">
+        </div>
+        <div class="m-field">
+          <div class="m-label">
+            Observação Interna
+            <i class="fas fa-eye-slash" style="font-size:9px;opacity:0.5;margin-left:4px;"></i>
+          </div>
+          <input type="text" class="m-input" id="mObsInterna" placeholder="Apenas você vê">
+          <div class="obs-note">Não aparece ao cliente.</div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="fecharModal('modalCliente')">Cancelar</button>
+        <button class="btn-confirm" id="btnConfirmarCliente" onclick="confirmarCliente()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     Modal: Confirmar
+══════════════════════════════════════════════════════════ -->
+<div class="overlay" id="modalConfirmar">
+  <div class="modal-wrap confirm-modal">
+    <div class="modal-inner" style="padding:32px 28px;text-align:center;">
+      <div class="confirm-icon"
+           style="background:rgba(46,109,164,0.08);border:1px solid rgba(46,109,164,0.22);">
+        <i class="fas fa-question" style="color:#2E6DA4;"></i>
+      </div>
+      <div class="confirm-title">Confirmar?</div>
+      <div class="confirm-sub" id="confirmSubText">Deseja aplicar estas alterações?</div>
+      <div class="modal-actions" style="justify-content:center;">
+        <button class="btn-cancel" style="flex:1;max-width:120px;"
+                onclick="fecharModal('modalConfirmar')">Não</button>
+        <button class="btn-confirm" style="flex:1;max-width:120px;" id="btnSim">Sim</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     Modal: Excluir
+══════════════════════════════════════════════════════════ -->
+<div class="overlay" id="modalExcluir">
+  <div class="modal-wrap confirm-modal">
+    <div class="modal-inner" style="padding:32px 28px;text-align:center;">
+      <div class="confirm-icon"
+           style="background:rgba(192,74,58,0.08);border:1px solid rgba(192,74,58,0.22);">
+        <i class="fas fa-exclamation-triangle" style="color:#C04A3A;"></i>
+      </div>
+      <div class="confirm-title" style="color:#C04A3A;">Atenção</div>
+      <div class="confirm-sub">
+        Esta ação irá apagar permanentemente todos os dados do cliente. Não há como desfazer.
+      </div>
+      <div class="modal-actions" style="justify-content:center;">
+        <button class="btn-cancel" style="flex:1;max-width:120px;"
+                onclick="fecharModal('modalExcluir')">Cancelar</button>
+        <button class="btn-confirm"
+                style="flex:1;max-width:120px;background:linear-gradient(135deg,#C04A3A,#8B2A1A);"
+                id="btnExcluirSim">Excluir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div id="toast">
+  <i class="fas fa-check"></i>
+  <span id="toastMsg">Salvo com sucesso.</span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     JavaScript
+══════════════════════════════════════════════════════════ -->
+<script src="tema.js"></script>
+<script>
+const URL_BASE = 'https://api-advogada.siterefrigeracaoeliezer.workers.dev';
+const URL_API  = URL_BASE + '/api/v1';
+
+const AREAS = [
+  'Direito Trabalhista','Direito da Família','Direito Previdenciário',
+  'Direito do Consumidor','Direito Imobiliário','Direito Tributário',
+  'Direito Penal / Criminal','Direito Sucessório','Direito Digital','Direito Empresarial'
+];
+
+let dbClientes    = [];
+let modoEdicao    = false;
+let clienteEditId = '';
+
+// ── Loading ────────────────────────────────────────────────
+function showLoading() { document.getElementById('globalLoader').classList.add('show'); }
+function hideLoading() { document.getElementById('globalLoader').classList.remove('show'); }
+
+// ── Toast ──────────────────────────────────────────────────
+function showToast(msg = 'Salvo com sucesso.') {
+  document.getElementById('toastMsg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── Tabs ───────────────────────────────────────────────────
+function switchTab(tab) {
+  const tabNames = ['clientes', 'perfil', 'credenciais'];
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', tabNames[i] === tab);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ── Modais ─────────────────────────────────────────────────
+function abrirModal(id)  { document.getElementById(id).classList.add('show'); }
+function fecharModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// ── Msg inline ─────────────────────────────────────────────
+function showInlineMsg(id, txt, tipo) {
+  const box = document.getElementById(id);
+  box.className = 'msg-inline show ' + tipo;
+  box.querySelector('i').className = tipo === 'error' ? 'fas fa-circle-xmark' : 'fas fa-circle-check';
+  box.querySelector('span').textContent = txt;
+}
+function hideInlineMsg(id) { document.getElementById(id).className = 'msg-inline'; }
+
+// ── Toggle senha ───────────────────────────────────────────
+function togglePassCred(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  const novo = inp.type === 'password' ? 'text' : 'password';
+  inp.type = novo;
+  btn.querySelector('i').className = novo === 'text' ? 'fas fa-eye-slash' : 'fas fa-eye';
+}
+
+// ── Força da senha ─────────────────────────────────────────
+function avaliarForcaCred(v) {
+  const fill  = document.getElementById('credStrFill');
+  const label = document.getElementById('credStrLabel');
+  if (!v) { fill.style.width = '0%'; label.textContent = ''; return; }
+  let score = 0;
+  if (v.length >= 8)          score++;
+  if (v.length >= 12)         score++;
+  if (/[A-Z]/.test(v))        score++;
+  if (/[0-9]/.test(v))        score++;
+  if (/[^A-Za-z0-9]/.test(v)) score++;
+  const lvs = [
+    { w:'20%', c:'#C04A3A', t:'Muito fraca' },
+    { w:'40%', c:'#C07830', t:'Fraca'       },
+    { w:'60%', c:'#B89830', t:'Média'       },
+    { w:'80%', c:'#2E6DA4', t:'Forte'       },
+    { w:'100%',c:'#2E6DA4', t:'Muito forte' },
+  ];
+  const lv = lvs[Math.min(score, 4)];
+  fill.style.width = lv.w; fill.style.background = lv.c;
+  label.textContent = lv.t; label.style.color = lv.c;
+}
+
+// ── Máscaras ───────────────────────────────────────────────
+function maskProcess(i) {
+  let v = i.value.replace(/\D/g,'');
+  if (v.length > 20) v = v.substring(0, 20);
+  v = v.replace(/^(\d{7})(\d)/,'$1-$2')
+       .replace(/-(\d{2})(\d)/,'-$1.$2')
+       .replace(/\.(\d{4})(\d)/,'.$1.$2')
+       .replace(/\.(\d{1})(\d)/,'.$1.$2')
+       .replace(/\.(\d{2})(\d)/,'.$1.$2');
+  i.value = v;
+}
+function maskPhone(i) {
+  let v = i.value.replace(/\D/g,'');
+  if (v.length > 11) v = v.substring(0, 11);
+  v = v.replace(/^(\d{2})(\d)/g,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2');
+  i.value = v;
+}
+function maskOAB(i) {
+  let v = i.value.toUpperCase();
+  if (!v.startsWith('OAB/')) v = 'OAB/';
+  let p = v.split('/'), c = p[1] || '';
+  c = c.replace(/[^A-Z0-9]/g,'');
+  let st = c.substring(0,2).replace(/[0-9]/g,''), n = c.substring(st.length).replace(/\D/g,'');
+  if (n.length > 6) n = n.substring(0,6);
+  if (n.length > 3) n = n.replace(/^(\d{3})(\d)/,'$1.$2');
+  i.value = 'OAB/' + st + (n ? ' ' + n : '');
+}
+function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e).toLowerCase()); }
+function formatDate(iso) {
+  if (!iso) return '—';
+  try {
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? iso : d.toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
+  } catch { return iso; }
+}
+
+// ── Init ───────────────────────────────────────────────────
+async function init() {
+  const sessao = await verificarSessaoComTema('admin');
+  if (!sessao) return;
+  initAreas();
+  await Promise.all([carregarPerfil(), carregarClientes()]);
+}
+
+// ── Áreas ──────────────────────────────────────────────────
+function initAreas() {
+  const g = document.getElementById('areasGrid');
+  g.innerHTML = AREAS.map(a =>
+    `<label class="area-check"><input type="checkbox" class="area-ck" value="${a}"><span>${a}</span></label>`
+  ).join('');
+}
+function getAreasVisiveis() {
+  return Array.from(document.querySelectorAll('.area-ck:checked')).map(c => c.value).join('|');
+}
+function setAreasVisiveis(str) {
+  const arr = str ? str.split('|') : AREAS;
+  document.querySelectorAll('.area-ck').forEach(c => { c.checked = arr.includes(c.value); });
+}
+
+// ── Carregar perfil ────────────────────────────────────────
+async function carregarPerfil() {
+  showLoading();
+  try {
+    const res = await fetch(URL_API, {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'bio' })
+    });
+    const d = await res.json();
+
+    document.getElementById('cfgName').value  = d.name  || '';
+    document.getElementById('cfgOab').value   = d.oab   || '';
+    document.getElementById('cfgImg').value   = d.img   || '';
+    document.getElementById('cfgPhone').value = d.phone || '';
+    document.getElementById('cfgDesc').value  = d.desc  || '';
+    setAreasVisiveis(d.areas_visiveis || '');
+
+    // Preencher filtro de tipos
+    const sel = document.getElementById('filtroTipo');
+    sel.innerHTML = '<option value="">Todos os tipos</option>';
+    AREAS.forEach(a => {
+      const o = document.createElement('option');
+      o.value = a; o.textContent = a; sel.appendChild(o);
+    });
+
+    // Preencher select modal
+    const mTipo = document.getElementById('mTipo');
+    const av    = d.areas_visiveis ? d.areas_visiveis.split('|') : AREAS;
+    mTipo.innerHTML = '';
+    av.forEach(a => {
+      const o = document.createElement('option');
+      o.value = a; o.textContent = a; mTipo.appendChild(o);
+    });
+
+  } catch (e) { console.error(e); }
+  finally { hideLoading(); }
+}
+
+// ── Salvar perfil público ──────────────────────────────────
+async function salvarPerfil() {
+  showLoading();
+  try {
+    const body = {
+      action: 'save_profile',
+      name:   document.getElementById('cfgName').value,
+      oab:    document.getElementById('cfgOab').value,
+      img:    document.getElementById('cfgImg').value,
+      phone:  document.getElementById('cfgPhone').value,
+      desc:   document.getElementById('cfgDesc').value,
+      areas_visiveis: getAreasVisiveis(),
+    };
+    const res = await fetch(URL_API, {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    const d = await res.json();
+    if (d.status === 'ok') showToast('Perfil público salvo com sucesso.');
+    else alert(d.message || 'Erro ao salvar.');
+  } catch { alert('Erro de conexão.'); }
+  finally { hideLoading(); }
+}
+
+// ── Salvar credenciais privadas ────────────────────────────
+async function salvarCredenciais() {
+  ['msgEmail','msgSenha','msgPalavra'].forEach(id => hideInlineMsg(id));
+
+  const email   = document.getElementById('credEmail').value.trim().toLowerCase();
+  const senha   = document.getElementById('credSenha').value;
+  const conf    = document.getElementById('credSenhaConf').value;
+  const palavra = document.getElementById('credPalavra').value.trim().toLowerCase();
+
+  if (!email && !senha && !palavra) {
+    showInlineMsg('msgEmail','Preencha pelo menos um campo para alterar.','error'); return;
+  }
+  if (email && !validEmail(email)) {
+    showInlineMsg('msgEmail','E-mail inválido.','error'); return;
+  }
+  if (senha) {
+    if (senha.length < 8) { showInlineMsg('msgSenha','Mínimo 8 caracteres.','error'); return; }
+    if (senha !== conf)   { showInlineMsg('msgSenha','As senhas não coincidem.','error'); return; }
+  }
+  if (palavra && palavra.length < 4) {
+    showInlineMsg('msgPalavra','Palavra-chave muito curta (mínimo 4 caracteres).','error'); return;
+  }
+  if (palavra && ['admin','senha','acesso'].includes(palavra)) {
+    showInlineMsg('msgPalavra','Escolha uma palavra-chave mais exclusiva.','error'); return;
+  }
+
+  showLoading();
+  try {
+    const body = {};
+    if (email)   body.email           = email;
+    if (senha)   body.senha           = senha;
+    if (palavra) body.palavra_secreta = palavra;
+
+    const res = await fetch(URL_BASE + '/api/update-secret-login', {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body),
+    });
+    const d = await res.json();
+
+    if (d.status === 'ok') {
+      ['credEmail','credSenha','credSenhaConf','credPalavra'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('credStrFill').style.width  = '0%';
+      document.getElementById('credStrLabel').textContent = '';
+      showToast('Credenciais atualizadas com segurança.');
+    } else {
+      showInlineMsg('msgEmail', d.message || 'Erro ao salvar.', 'error');
+    }
+  } catch {
+    showInlineMsg('msgEmail','Erro de conexão com o servidor.','error');
+  } finally {
+    hideLoading();
+  }
+}
+
+// ── Carregar clientes ──────────────────────────────────────
+async function carregarClientes() {
+  showLoading();
+  try {
+    const res = await fetch(URL_API, {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'listar_clientes' })
+    });
+    const d   = await res.json();
+    dbClientes = Array.isArray(d) ? d : [];
+    atualizarDashboard();
+    renderClientes();
+  } catch (e) { console.error(e); }
+  finally { hideLoading(); }
+}
+
+// ── Dashboard ──────────────────────────────────────────────
+function atualizarDashboard() {
+  const andamento  = dbClientes.filter(c => {
+    const tl = c.timeline || []; const l = tl[tl.length-1];
+    return !l || l.status !== 'Processo Finalizado / Arquivado';
+  }).length;
+  const finalizado = dbClientes.length - andamento;
+  const pendente   = dbClientes.filter(c => c.notif_status === 'Pendente').length;
+  document.getElementById('dAndamento').textContent  = andamento;
+  document.getElementById('dFinalizado').textContent = finalizado;
+  document.getElementById('dPendente').textContent   = pendente;
+}
+
+// ── Render clientes ────────────────────────────────────────
+function renderClientes() {
+  const list    = document.getElementById('clientList');
+  const busca   = document.getElementById('filtroNome').value.toLowerCase();
+  const fStatus = document.getElementById('filtroStatus').value;
+  const fTipo   = document.getElementById('filtroTipo').value;
+
+  const filtered = dbClientes.filter(c => {
+    const tl  = c.timeline || [];
+    const las = tl[tl.length-1];
+    return (c.nome || '').toLowerCase().includes(busca) &&
+      (!fStatus || (las && las.status === fStatus)) &&
+      (!fTipo   || c.tipo_acao === fTipo);
+  });
+
+  list.innerHTML = '';
+  if (!filtered.length) {
+    list.innerHTML = `<div style="text-align:center;padding:40px;font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:#9AADC4;font-weight:400;">Nenhum cliente encontrado.</div>`;
+    return;
+  }
+
+  [...filtered].reverse().forEach(c => {
+    const tl  = c.timeline || [];
+    const las = tl[tl.length-1];
+    const fin = las && las.status === 'Processo Finalizado / Arquivado';
+
+    const card = document.createElement('div');
+    card.className = 'client-card';
+    if (fin) card.style.opacity = '0.6';
+
+    const info  = document.createElement('div'); info.className = 'cc-info';
+    const name  = document.createElement('div'); name.className = 'cc-name'; name.textContent = c.nome || '';
+    const meta  = document.createElement('div'); meta.className = 'cc-meta';
+    const bTipo = document.createElement('span'); bTipo.className = 'cc-badge tipo'; bTipo.textContent = c.tipo_acao || 'Processo';
+    meta.appendChild(bTipo);
+
+    if (c.notif_status === 'Pendente') {
+      const bN = document.createElement('span'); bN.className = 'cc-badge pendente';
+      bN.innerHTML = '<i class="fas fa-bell" style="margin-right:3px;font-size:8px;"></i>Pendente';
+      meta.appendChild(bN);
+    } else if (c.notif_status === 'Lido') {
+      const bN = document.createElement('span'); bN.className = 'cc-badge lido';
+      bN.innerHTML = '<i class="fas fa-check" style="margin-right:3px;font-size:8px;"></i>Lido';
+      meta.appendChild(bN);
+    }
+    if (fin) {
+      const bF = document.createElement('span'); bF.className = 'cc-badge finalizado';
+      bF.textContent = 'Finalizado'; meta.appendChild(bF);
+    }
+
+    const status = document.createElement('div'); status.className = 'cc-status';
+    status.textContent = las ? las.status : 'Sem status';
+    const acesso = document.createElement('div'); acesso.className = 'cc-acesso';
+    acesso.textContent = c.ultimo_acesso ? `Último acesso: ${formatDate(c.ultimo_acesso)}` : 'Nunca acessou';
+
+    info.append(name, meta, status, acesso);
+
+    const acts = document.createElement('div'); acts.className = 'cc-actions';
+    const eBtn = document.createElement('button'); eBtn.className = 'act-btn';
+    eBtn.innerHTML = '<i class="fas fa-pen"></i>';
+    eBtn.addEventListener('click', () => abrirEdicao(c.id));
+    const dBtn = document.createElement('button'); dBtn.className = 'act-btn del';
+    dBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+    dBtn.addEventListener('click', () => confirmarExclusao(c.id));
+    acts.append(eBtn, dBtn);
+    card.append(info, acts);
+    list.appendChild(card);
+  });
+}
+
+// ── Modal novo cliente ─────────────────────────────────────
+function abrirModalNovo() {
+  modoEdicao = false; clienteEditId = '';
+  document.getElementById('modalClienteTitulo').textContent = 'Novo Cliente';
+  document.getElementById('btnConfirmarCliente').textContent = 'Salvar';
+  ['mNome','mEmail','mNumProc','mDesc','mObs','mObsInterna','mNotifMsg'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('mFase').value    = '10';
+  document.getElementById('mStatus').value  = 'Petição Inicial Protocolada';
+  document.getElementById('mNotifAtiva').checked = false;
+  document.getElementById('mNotificar').checked  = true;
+  document.getElementById('mNovoCard').checked   = false;
+  document.getElementById('novoCardWrap').style.display = 'none';
+  abrirModal('modalCliente');
+}
+
+// ── Modal editar cliente ───────────────────────────────────
+function abrirEdicao(id) {
+  const c = dbClientes.find(x => String(x.id) === String(id));
+  if (!c) return;
+  modoEdicao = true; clienteEditId = String(c.id);
+  document.getElementById('modalClienteTitulo').textContent  = 'Editar Registro';
+  document.getElementById('btnConfirmarCliente').textContent = 'Atualizar';
+  document.getElementById('mNome').value        = c.nome            || '';
+  document.getElementById('mEmail').value       = c.email           || '';
+  document.getElementById('mNumProc').value     = c.numero_processo || '';
+  document.getElementById('mFase').value        = String(c.fase_atual || 10);
+  document.getElementById('mObs').value         = c.obs             || '';
+  document.getElementById('mObsInterna').value  = c.obs_interna     || '';
+  document.getElementById('mNotifMsg').value    = c.notif_msg       || '';
+  document.getElementById('mNotifAtiva').checked = c.notif_status === 'Pendente';
+  document.getElementById('mNotificar').checked  = c.notificar === 'SIM';
+  document.getElementById('novoCardWrap').style.display = 'flex';
+  document.getElementById('mNovoCard').checked   = false;
+  const tl   = c.timeline || [];
+  const last = tl[tl.length-1] || { status:'Petição Inicial Protocolada', descricao:'' };
+  document.getElementById('mStatus').value = last.status    || '';
+  document.getElementById('mDesc').value   = last.descricao || '';
+  abrirModal('modalCliente');
+}
+
+function confirmarCliente() {
+  const email = document.getElementById('mEmail').value;
+  if (!validEmail(email)) { alert('E-mail inválido.'); return; }
+  document.getElementById('confirmSubText').textContent = 'Deseja salvar as alterações deste cliente?';
+  document.getElementById('btnSim').onclick = salvarCliente;
+  fecharModal('modalCliente');
+  abrirModal('modalConfirmar');
+}
+
+async function salvarCliente() {
+  fecharModal('modalConfirmar'); showLoading();
+  const notifAtiva = document.getElementById('mNotifAtiva').checked;
+  const body = {
+    nome:              document.getElementById('mNome').value,
+    email:             document.getElementById('mEmail').value,
+    tipo_acao:         document.getElementById('mTipo').value,
+    numero_processo:   document.getElementById('mNumProc').value,
+    fase_atual:        document.getElementById('mFase').value,
+    notificar:         document.getElementById('mNotificar').checked ? 'SIM' : 'NAO',
+    notif_status:      notifAtiva ? 'Pendente' : '',
+    notif_msg:         document.getElementById('mNotifMsg').value,
+    obs:               document.getElementById('mObs').value,
+    obs_interna:       document.getElementById('mObsInterna').value,
+    status:            document.getElementById('mStatus').value,
+    descricao:         document.getElementById('mDesc').value,
+  };
+  if (modoEdicao) {
+    body.action      = 'update_client_timeline';
+    body.id          = clienteEditId;
+    body.status_atual = body.status; delete body.status;
+    body.novo_texto   = body.descricao; delete body.descricao;
+    body.is_new_card  = document.getElementById('mNovoCard').checked;
+  } else {
+    body.action = 'save_client';
+  }
+  try {
+    const res = await fetch(URL_API, {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    const d = await res.json();
+    if (d.status === 'ok') {
+      showToast(modoEdicao ? 'Cliente atualizado.' : 'Cliente cadastrado.');
+      await carregarClientes();
+    } else alert(d.message || 'Erro ao salvar.');
+  } catch { alert('Erro de conexão.'); }
+  finally { hideLoading(); }
+}
+
+function confirmarExclusao(id) {
+  document.getElementById('btnExcluirSim').onclick = async () => {
+    fecharModal('modalExcluir'); showLoading();
+    try {
+      const res = await fetch(URL_API, {
+        method:'POST', credentials:'include',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'delete_client', id: String(id) })
+      });
+      const d = await res.json();
+      if (d.status === 'ok') { showToast('Cliente removido.'); await carregarClientes(); }
+      else alert(d.message || 'Erro.');
+    } catch { alert('Erro de conexão.'); }
+    finally { hideLoading(); }
+  };
+  abrirModal('modalExcluir');
+}
+
+// ── Logout ─────────────────────────────────────────────────
+async function logout() {
+  try {
+    await fetch(URL_API, {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'logout' }),
+    });
+  } catch {}
+  window.location.href = 'manutencao.html';
+}
+
+// ── DOMContentLoaded ───────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  init();
+});
+</script>
+</body>
+</html>

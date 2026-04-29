@@ -1,0 +1,16 @@
+{
+  "name": "Dra. Ana",
+  "short_name": "Gestor - Dra. Ana",
+  "description": "Acompanhamento de processos jurídicos",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0A1628",
+  "theme_color": "#2E6DA4",
+  "icons": [
+    {
+      "src": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhHtE2js3Aj9ZLxGzW-qg0iuRkcQvHrLMREwdxYyxwFQZ9IoEp_lYYjezzImcmSIoIPT0GDbAKn0HgZY757h6ob0P-RArslGJ8ca8R395S1oruz8a0R_BXc9OMWQwpqodGTFwq3rNdhshjmU9GgIvaBNAr7JmvgrH6GpbbxqgPXHy_42z9P43RM4frkdlc/w494-h494/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
