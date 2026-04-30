@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' https://blogger.googleusercontent.com data:; connect-src 'self' https://*.workers.dev;">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Advocacia">
+    <link rel="apple-touch-icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhHtE2js3Aj9ZLxGzW-qg0iuRkcQvHrLMREwdxYyxwFQZ9IoEp_lYYjezzImcmSIoIPT0GDbAKn0HgZY757h6ob0P-RArslGJ8ca8R395S1oruz8a0R_BXc9OMWQwpqodGTFwq3rNdhshjmU9GgIvaBNAr7JmvgrH6GpbbxqgPXHy_42z9P43RM4frkdlc/w494-h494/logo.png">
+    <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhHtE2js3Aj9ZLxGzW-qg0iuRkcQvHrLMREwdxYyxwFQZ9IoEp_lYYjezzImcmSIoIPT0GDbAKn0HgZY757h6ob0P-RArslGJ8ca8R395S1oruz8a0R_BXc9OMWQwpqodGTFwq3rNdhshjmU9GgIvaBNAr7JmvgrH6GpbbxqgPXHy_42z9P43RM4frkdlc/w494-h494/logo.png">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advocacia | Gestão Processual</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                colors: {
+                    navy:       '#0A1628',
+                    navyMid:    '#111E35',
+                    navyLight:  '#1C2D4A',
+                    steel:      '#2E6DA4',
+                    steelLight: '#4A8DC4',
+                    steelDim:   '#1A4A72',
+                    iceWhite:   '#E8EDF4',
+                    silverFog:  '#9AADC4',
+                    gunmetal:   '#2C3344',
+                },
+                fontFamily: {
+                    serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+                    sans:  ['Inter', 'sans-serif'],
+                }
+            }
+        }
+    }
+
+    /* ── Tema global: padrão é ESCURO (azul navy) ── */
+    (function() {
+        var saved = localStorage.getItem('ADV_GLOBAL_THEME');
+        if (!saved) { saved = 'dark'; localStorage.setItem('ADV_GLOBAL_THEME', 'dark'); }
+        var html = document.documentElement;
+        if (saved === 'dark') {
+            html.classList.add('dark');
+            html.classList.remove('light');
+        } else {
+            html.classList.add('light');
+            html.classList.remove('dark');
+        }
+    })();
+    </script>
+
+    <style>
+        /* ── Reset & Base ── */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+        input, select, textarea {
+            -webkit-user-select: text !important;
+            user-select: text !important;
+        }
+        img {
+            pointer-events: none !important;
+            -webkit-user-drag: none !important;
+        }
+
+        /* ── Typography ── */
+        .font-serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+        .font-sans  { font-family: 'Inter', sans-serif; }
+
+        /* ── Geometric Background Pattern ── */
+        .bg-pattern {
+            background-color: #F0F4F8;
+            background-image:
+                linear-gradient(rgba(46,109,164,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(46,109,164,0.04) 1px, transparent 1px);
+            background-size: 48px 48px;
+            transition: background-color 0.3s ease;
+        }
+        html.dark .bg-pattern {
+            background-color: #0A1628 !important;
+            background-image:
+                linear-gradient(rgba(46,109,164,0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(46,109,164,0.08) 1px, transparent 1px) !important;
+            background-size: 48px 48px;
+        }
+
+        /* ── Header ── */
+        .header-bar {
+            background: rgba(240, 244, 248, 0.88);
+            border-bottom: 1px solid rgba(46,109,164,0.18);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: background 0.3s ease;
+        }
+        html.dark .header-bar {
+            background: rgba(10, 22, 40, 0.92) !important;
+            border-bottom: 1px solid rgba(46,109,164,0.25);
+        }
+
+        /* ── Steel Gradient Button ── */
+        .steel-gradient {
+            background: linear-gradient(135deg, #2E6DA4 0%, #1A4A72 100%);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .steel-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+            transition: left 0.5s ease;
+        }
+        .steel-gradient:hover::before { left: 100%; }
+        .steel-gradient:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(46,109,164,0.35); }
+        .steel-gradient:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* ── Card ── */
+        .card {
+            background: #FFFFFF;
+            border: 1px solid rgba(46,109,164,0.12);
+            box-shadow: 0 2px 20px rgba(10,22,40,0.08);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+        html.dark .card {
+            background: #111E35 !important;
+            border: 1px solid rgba(46,109,164,0.20);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+        }
+
+        /* ── Profile Photo Frame ── */
+        .profile-frame {
+            position: relative;
+            display: inline-block;
+        }
+        .profile-frame::before {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2E6DA4 0%, #0A1628 60%, #2E6DA4 100%);
+            z-index: 0;
+        }
+        .profile-frame::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4A8DC4 0%, #1A4A72 100%);
+            z-index: 0;
+        }
+        .profile-frame img {
+            position: relative;
+            z-index: 1;
+            border-radius: 50%;
+            border: 4px solid #FFFFFF;
+        }
+        html.dark .profile-frame img { border-color: #111E35; }
+
+        /* ── OAB Badge ── */
+        .oab-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(46,109,164,0.10);
+            border: 1px solid rgba(46,109,164,0.25);
+            border-radius: 4px;
+            padding: 4px 14px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            color: #2E6DA4;
+            text-transform: uppercase;
+        }
+        html.dark .oab-badge {
+            background: rgba(46,109,164,0.15);
+            border-color: rgba(74,141,196,0.3);
+            color: #4A8DC4;
+        }
+
+        /* ── Divider with icon ── */
+        .divider-icon {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .divider-icon::before,
+        .divider-icon::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(46,109,164,0.3), transparent);
+        }
+
+        /* ── Social Buttons ── */
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            border: 1px solid rgba(46,109,164,0.25);
+            color: #2E6DA4;
+            font-size: 20px;
+            transition: all 0.25s ease;
+            background: rgba(46,109,164,0.06);
+        }
+        .social-btn:hover {
+            background: #2E6DA4;
+            border-color: #2E6DA4;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46,109,164,0.30);
+        }
+        html.dark .social-btn {
+            background: rgba(46,109,164,0.10);
+            border-color: rgba(74,141,196,0.25);
+            color: #4A8DC4;
+        }
+        html.dark .social-btn:hover { background: #2E6DA4; color: #fff; }
+
+        /* ── Input Underline ── */
+        .input-line {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid rgba(46,109,164,0.25);
+            padding: 10px 0;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            color: #0A1628;
+            transition: border-color 0.25s ease;
+        }
+        .input-line::placeholder { color: rgba(10,22,40,0.35); }
+        .input-line:focus { border-bottom-color: #2E6DA4; }
+        html.dark .input-line { color: #E8EDF4; }
+        html.dark .input-line::placeholder { color: rgba(232,237,244,0.35); }
+        html.dark .input-line:focus { border-bottom-color: #4A8DC4; }
+
+        /* ── Loader ── */
+        .loader {
+            border: 3px solid rgba(46,109,164,0.15);
+            border-top: 3px solid #2E6DA4;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+
+        /* ── Modal Blur ── */
+        .modal-blur { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+
+        /* ── Decorative corners ── */
+        .corner-tl {
+            position: absolute;
+            top: 16px; left: 16px;
+            width: 24px; height: 24px;
+            border-top: 2px solid rgba(46,109,164,0.4);
+            border-left: 2px solid rgba(46,109,164,0.4);
+        }
+        .corner-br {
+            position: absolute;
+            bottom: 16px; right: 16px;
+            width: 24px; height: 24px;
+            border-bottom: 2px solid rgba(46,109,164,0.4);
+            border-right: 2px solid rgba(46,109,164,0.4);
+        }
+
+        /* ── OTP Input ── */
+        #inputOtp {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            letter-spacing: 0.55em;
+        }
+
+        /* ── Modal panel scale ── */
+        .modal-panel {
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* ── Section label ── */
+        .section-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #2E6DA4;
+            opacity: 0.75;
+        }
+
+        /* ── Install Button ── */
+        #installApp {
+            background: linear-gradient(135deg, #2E6DA4, #1A4A72);
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            border-radius: 6px;
+        }
+
+        /* ── Notification Banner ── */
+        .notif-banner {
+            display: none;
+            width: 100%;
+            max-width: 448px;
+            margin-bottom: 16px;
+            background: rgba(46,109,164,0.06);
+            border: 1px solid rgba(46,109,164,0.18);
+            border-left: 3px solid rgba(46,109,164,0.55);
+            border-radius: 4px;
+            padding: 13px 18px;
+            gap: 12px;
+            align-items: flex-start;
+            animation: fadeUp 0.35s ease both;
+        }
+        .notif-banner.flex, .notif-banner[style*="flex"] { display: flex; }
+        html.dark .notif-banner {
+            background: rgba(46,109,164,0.10);
+            border-color: rgba(74,141,196,0.20);
+            border-left-color: rgba(74,141,196,0.55);
+        }
+
+        /* ── Primeiro Acesso Banner ── */
+        .primeiro-acesso-banner {
+            display: none;
+            width: 100%;
+            max-width: 448px;
+            margin-bottom: 20px;
+            background: rgba(46,109,164,0.06);
+            border: 1px solid rgba(46,109,164,0.18);
+            border-left: 3px solid rgba(46,109,164,0.55);
+            border-radius: 4px;
+            padding: 14px 18px;
+            gap: 12px;
+            align-items: flex-start;
+            animation: fadeUp 0.5s ease both;
+        }
+        .primeiro-acesso-banner.flex, .primeiro-acesso-banner[style*="flex"] { display: flex; }
+        html.dark .primeiro-acesso-banner {
+            background: rgba(46,109,164,0.10);
+            border-color: rgba(74,141,196,0.20);
+            border-left-color: rgba(74,141,196,0.55);
+        }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+    </style>
+</head>
+
+<body class="bg-pattern min-h-screen font-sans" style="color:#0A1628; transition: color 0.3s ease;">
+<style>
+    html.dark body { color: #E8EDF4 !important; }
+</style>
+
+<!-- ── Global Loader ── -->
+<div id="globalLoader" class="fixed inset-0 z-[200] hidden items-center justify-center bg-navy/30 backdrop-blur-sm">
+    <div class="bg-white dark:bg-navyMid p-8 rounded-2xl shadow-2xl flex flex-col items-center border border-steel/20">
+        <div class="loader mb-4"></div>
+        <p class="text-steel dark:text-steelLight font-semibold text-xs tracking-[0.2em] uppercase">Verificando...</p>
+    </div>
+</div>
+
+<!-- ── Header ── -->
+<header class="header-bar fixed top-0 w-full z-50 px-5 py-3 flex justify-between items-center">
+    <div class="flex items-center gap-2 opacity-80">
+        <div class="w-5 h-5 border-2 border-steel/50 rotate-45 flex items-center justify-center">
+            <div class="w-1.5 h-1.5 bg-steel rounded-none rotate-0"></div>
+        </div>
+        <span class="text-[10px] font-semibold tracking-[0.22em] uppercase text-steel/70 hidden sm:block">Gestão Processual</span>
+    </div>
+
+    <div class="flex items-center gap-3">
+        <button id="installApp" class="hidden text-white px-4 py-2 font-semibold transition-all shadow-lg">
+            <i class="fas fa-download mr-2 text-xs"></i>BAIXAR APP
+        </button>
+        <button onclick="toggleDarkMode()" class="w-9 h-9 flex items-center justify-center rounded-lg border border-steel/20 hover:bg-steel/10 transition-all">
+            <i id="themeIcon" class="fas fa-moon text-steel dark:text-steelLight text-sm"></i>
+        </button>
+    </div>
+</header>
+
+<!-- ── Main Content ── -->
+<main class="pt-24 pb-16 px-4 max-w-md mx-auto">
+
+    <!-- Banner: Primeiro Acesso (admin) -->
+    <div class="primeiro-acesso-banner" id="primeiroAcessoBanner">
+        <i class="fas fa-circle-info text-steel dark:text-steelLight text-sm mt-0.5 flex-shrink-0"></i>
+        <p class="text-xs leading-relaxed font-light text-navy/70 dark:text-iceWhite/60">
+            <span class="font-semibold text-steel dark:text-steelLight">Configuração necessária</span>
+            — <span id="primeiroAcessoTexto"></span>
+        </p>
+    </div>
+
+    <!-- Banner: Notificação de Processo -->
+    <div class="notif-banner" id="notifBanner">
+        <i class="fas fa-bell text-steel dark:text-steelLight text-sm mt-0.5 flex-shrink-0"></i>
+        <p class="text-xs leading-relaxed font-semibold text-steel dark:text-steelLight" id="notifBannerTexto"></p>
+    </div>
+
+    <!-- ── Bio Section ── -->
+    <section id="view-bio" class="text-center mb-10">
+
+        <!-- Thin top rule -->
+        <div class="flex items-center gap-3 mb-8 opacity-40">
+            <div class="flex-1 h-px bg-gradient-to-r from-transparent via-steel to-transparent"></div>
+            <div class="w-1.5 h-1.5 bg-steel rotate-45"></div>
+            <div class="flex-1 h-px bg-gradient-to-r from-transparent via-steel to-transparent"></div>
+        </div>
+
+        <!-- Profile Photo -->
+        <div class="profile-frame w-44 h-44 mx-auto mb-7">
+            <img id="bio-img"
+                 src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiGaEVTw5lfLFBN6DQyXlxRH5jYjaFoYWedjR0xPphZ31_Khb5h5IZcoGgFuUv4tYZtVaz7sZ-CiF7jZAYqot3DGcrvqZM9lcgnz-PQK4N9IkNJCJ6nPyRyd4R0ZpLoGpL1jqgG63NMVrcjVSvE-KXQIJ68ty0tNVRS3TC0-PUK1vAVPx28CfwZcmje1nhY/w424-h424/logo.png"
+                 alt="Foto do Advogado"
+                 class="w-full h-full object-cover"
+                 style="border-radius:50%;">
+        </div>
+
+        <!-- Name -->
+        <h1 id="bio-name"
+            class="font-serif text-4xl font-bold tracking-wide text-navy dark:text-iceWhite mb-2 uppercase"
+            style="font-size: clamp(1.7rem, 5vw, 2.4rem); line-height: 1.15;">
+            Carregando...
+        </h1>
+
+        <!-- OAB Badge -->
+        <div class="flex justify-center mb-4">
+            <span id="bio-oab" class="oab-badge">
+                <i class="fas fa-balance-scale text-[10px]"></i>
+                OAB/MS 000.000
+            </span>
+        </div>
+
+        <!-- Description -->
+        <p id="bio-desc"
+           class="text-sm leading-relaxed px-6 max-w-xs mx-auto mb-6 opacity-60 font-light">
+            Sincronizando dados...
+        </p>
+
+        <!-- Divider with gavel -->
+        <div class="divider-icon opacity-30">
+            <i class="fas fa-gavel text-steel text-xs"></i>
+        </div>
+
+        <!-- Social Links -->
+        <div class="flex justify-center gap-3">
+            <a id="bio-phone" href="#" target="_blank" class="social-btn" title="WhatsApp">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+            <a id="bio-email" href="#" class="social-btn" title="E-mail">
+                <i class="fas fa-envelope"></i>
+            </a>
+        </div>
+
+    </section>
+
+    <!-- ── Search Card ── -->
+    <section class="card rounded-2xl relative overflow-hidden">
+        <div class="corner-tl"></div>
+        <div class="corner-br"></div>
+
+        <div class="p-8">
+            <!-- Card Header -->
+            <div class="mb-7 text-center">
+                <p class="section-label mb-2">Portal do Cliente</p>
+                <h3 class="font-serif text-2xl font-semibold text-navy dark:text-iceWhite tracking-wide">
+                    Consultar Processo
+                </h3>
+                <p class="text-xs opacity-40 mt-1 font-light tracking-wide">Acesse o histórico do seu caso</p>
+            </div>
+
+            <!-- Horizontal rule -->
+            <div class="w-12 h-0.5 bg-steel/40 mx-auto mb-7"></div>
+
+            <!-- Form -->
+            <div class="space-y-7" id="view-client-search">
+                <div>
+                    <label class="section-label block mb-2">
+                        <i class="fas fa-user-tie mr-1.5 text-[9px]"></i>Identificação do Reclamante
+                    </label>
+                    <input
+                        type="email"
+                        id="searchCpf"
+                        autocomplete="username"
+                        placeholder="Seu endereço de e-mail"
+                        class="input-line"
+                    >
+                </div>
+
+                <button
+                    id="btnSearch"
+                    class="steel-gradient w-full text-white font-semibold py-4 rounded-xl shadow-lg text-xs tracking-[0.18em] uppercase transition-all">
+                    <i class="fas fa-search mr-2 opacity-70"></i>
+                    Acessar Linha do Tempo
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer label -->
+    <p class="text-center text-[10px] tracking-[0.2em] uppercase opacity-25 mt-8 font-semibold">
+        Sistema Confidencial &mdash; Acesso Restrito
+    </p>
+
+</main>
+
+<!-- ══════════════════════════════════════════════
+     Modal: Código OTP
+══════════════════════════════════════════════ -->
+<div id="modalCode"
+     class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 modal-blur bg-navy/50">
+    <div class="modal-panel bg-white dark:bg-navyMid w-full max-w-sm rounded-2xl border border-steel/20 shadow-2xl relative overflow-hidden">
+
+        <!-- Top accent bar -->
+        <div class="h-1 w-full bg-gradient-to-r from-steelDim via-steel to-steelDim"></div>
+
+        <div class="p-8 text-center">
+            <!-- Icon -->
+            <div class="w-14 h-14 border border-steel/30 flex items-center justify-center mx-auto mb-5 rounded-xl"
+                 style="background: rgba(46,109,164,0.08);">
+                <i class="fas fa-shield-halved text-2xl text-steel dark:text-steelLight"></i>
+            </div>
+
+            <h3 class="font-serif text-2xl font-semibold text-navy dark:text-iceWhite mb-1 tracking-wide">
+                Verificação
+            </h3>
+            <p class="text-xs opacity-50 mb-5 leading-relaxed">
+                Insira o código de 6 dígitos enviado<br>para o seu e-mail cadastrado.
+            </p>
+
+            <!-- Timer -->
+            <div class="mb-6">
+                <span class="inline-flex items-center gap-2 text-xs font-semibold text-steel dark:text-steelLight px-4 py-1.5 rounded-full"
+                      style="background: rgba(46,109,164,0.08); border: 1px solid rgba(46,109,164,0.2);">
+                    <i class="fas fa-clock text-[10px]"></i>
+                    <span id="timerLabel">Expira em: <span id="timer">03:00</span></span>
+                </span>
+            </div>
+
+            <!-- OTP Input -->
+            <input type="text" id="inputOtp" maxlength="6" placeholder="000000"
+                   class="w-full bg-transparent border-b-2 border-steel/40 focus:border-steel text-center text-3xl font-bold outline-none py-2 mb-8 text-navy dark:text-iceWhite tracking-[0.5em] transition-colors">
+
+            <!-- Buttons -->
+            <div class="flex flex-col gap-3">
+                <button onclick="confirmCode()"
+                        class="steel-gradient w-full text-white font-semibold py-3.5 rounded-xl shadow-md text-xs tracking-[0.18em] uppercase transition-all">
+                    <i class="fas fa-check mr-2 opacity-80"></i>Validar Acesso
+                </button>
+                <button onclick="closeOtpModal()"
+                        class="w-full py-2 text-xs font-semibold opacity-30 hover:opacity-60 uppercase tracking-wider transition-opacity text-navy dark:text-iceWhite">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     Modal: Aviso / Erro
+══════════════════════════════════════════════ -->
+<div id="modalError"
+     class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 modal-blur bg-navy/50">
+    <div class="modal-panel bg-white dark:bg-navyMid w-full max-w-sm rounded-2xl border border-steel/20 shadow-2xl relative overflow-hidden text-center">
+
+        <!-- Top accent bar -->
+        <div class="h-1 w-full bg-gradient-to-r from-steelDim via-steel to-steelDim"></div>
+
+        <div class="p-10">
+            <!-- Icon -->
+            <div class="w-16 h-16 border border-steel/30 flex items-center justify-center mx-auto mb-6 rounded-xl"
+                 style="background: rgba(46,109,164,0.06);">
+                <i class="fas fa-info-circle text-2xl text-steel dark:text-steelLight"></i>
+            </div>
+
+            <h3 class="font-serif text-xl font-semibold text-navy dark:text-iceWhite mb-3 tracking-widest uppercase">
+                Aviso
+            </h3>
+            <p id="errorMessage" class="text-sm opacity-60 mb-9 leading-relaxed font-light">
+                Este e-mail não está autorizado a acessar o sistema.
+            </p>
+
+            <button onclick="closeErrorModal()"
+                    class="steel-gradient w-full text-white font-semibold py-4 rounded-xl shadow-lg text-xs tracking-[0.18em] uppercase transition-all">
+                Entendido
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Glossário (injetado por tema.js) -->
+<script>
+    try { document.write(getGlossarioModalHTML ? getGlossarioModalHTML() : ''); } catch(e) {}
+</script>
+
+<script src="tema.js"></script>
+<script src="app.js"></script>
+
+<script>
+/* ── Theme ── */
+function _applyTheme(mode) {
+    var html = document.documentElement;
+    var icon = document.getElementById('themeIcon');
+    if (mode === 'dark') {
+        html.classList.add('dark');
+        html.classList.remove('light');
+        if (icon) { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); }
+    } else {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        if (icon) { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); }
+    }
+    localStorage.setItem('ADV_GLOBAL_THEME', mode);
+}
+
+window.addEventListener('load', function() {
+    var saved = localStorage.getItem('ADV_GLOBAL_THEME') || 'dark';
+    _applyTheme(saved);
+});
+
+function toggleDarkMode() {
+    var isDark = document.documentElement.classList.contains('dark');
+    _applyTheme(isDark ? 'light' : 'dark');
+}
+
+/* ── Loader ── */
+function showLoading() { document.getElementById('globalLoader').classList.replace('hidden', 'flex'); }
+function hideLoading() { document.getElementById('globalLoader').classList.replace('flex', 'hidden'); }
+
+/* ── Modal OTP ── */
+let countdownInterval;
+
+function openModal() {
+    document.getElementById('modalCode').classList.replace('hidden', 'flex');
+    startTimer(180);
+}
+function closeOtpModal() {
+    document.getElementById('modalCode').classList.replace('flex', 'hidden');
+    clearInterval(countdownInterval);
+}
+
+function startTimer(duration) {
+    let remaining = duration;
+    clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+            clearInterval(countdownInterval);
+            document.getElementById('timerLabel').innerHTML = '<i class="fas fa-times-circle mr-1"></i>CÓDIGO EXPIRADO';
+            return;
+        }
+        const m = Math.floor(remaining / 60);
+        const s = remaining % 60;
+        document.getElementById('timer').textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+    }, 1000);
+}
+
+/* ── Modal Erro ── */
+function showErrorModal(msg) {
+    document.getElementById('errorMessage').textContent = msg;
+    document.getElementById('modalError').classList.replace('hidden', 'flex');
+}
+function closeErrorModal() {
+    document.getElementById('modalError').classList.replace('flex', 'hidden');
+}
+
+/* ── PWA Install ── */
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const btn = document.getElementById('installApp');
+    btn.classList.remove('hidden');
+    btn.classList.add('flex');
+});
+document.getElementById('installApp')?.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') document.getElementById('installApp').classList.add('hidden');
+        deferredPrompt = null;
+    }
+});
+</script>
+
+</body>
+</html>

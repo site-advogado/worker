@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.workers.dev;">
+    <title>Acesso Administrativo</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                colors: {
+                    navy:       '#0A1628',
+                    navyMid:    '#111E35',
+                    navyLight:  '#1C2D4A',
+                    steel:      '#2E6DA4',
+                    steelLight: '#4A8DC4',
+                    steelDim:   '#1A4A72',
+                    iceWhite:   '#E8EDF4',
+                    silverFog:  '#9AADC4',
+                    gunmetal:   '#2C3344',
+                },
+                fontFamily: {
+                    serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+                    sans:  ['Inter', 'sans-serif'],
+                }
+            }
+        }
+    }
+
+    /* ── Tema global: padrão é ESCURO (azul navy) ── */
+    (function() {
+        var saved = localStorage.getItem('ADV_GLOBAL_THEME');
+        if (!saved) { saved = 'dark'; localStorage.setItem('ADV_GLOBAL_THEME', 'dark'); }
+        var html = document.documentElement;
+        if (saved === 'dark') {
+            html.classList.add('dark');
+            html.classList.remove('light');
+        } else {
+            html.classList.add('light');
+            html.classList.remove('dark');
+        }
+    })();
+    </script>
+
+    <style>
+        /* ── Reset ── */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        /* ── Text selectability (needed to copy links) ── */
+        body { -webkit-user-select: text; user-select: text; }
+
+        /* ── Background Grid ── */
+        body {
+            background-color: #0A1628;
+            background-image:
+                linear-gradient(rgba(46,109,164,0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(46,109,164,0.08) 1px, transparent 1px);
+            background-size: 48px 48px;
+            min-height: 100vh;
+            transition: background-color 0.3s ease;
+            color: #E8EDF4;
+        }
+        html.light body {
+            background-color: #F0F4F8 !important;
+            background-image:
+                linear-gradient(rgba(46,109,164,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(46,109,164,0.04) 1px, transparent 1px) !important;
+            color: #0A1628 !important;
+        }
+        /* Radial glow only in dark */
+        html.light body::before { display: none; }
+        /* Corner frames light */
+        html.light .corner-frame.tl,
+        html.light .corner-frame.tr,
+        html.light .corner-frame.bl,
+        html.light .corner-frame.br { border-color: rgba(46,109,164,0.20); }
+        /* Card light mode */
+        html.light .card {
+            background: #FFFFFF !important;
+            border-color: rgba(46,109,164,0.14) !important;
+            box-shadow: 0 2px 20px rgba(10,22,40,0.08) !important;
+        }
+        html.light .card::before { background: linear-gradient(90deg, transparent, rgba(46,109,164,0.3), transparent); }
+        /* Field inputs light */
+        html.light .field-inner input { color: #0A1628 !important; }
+        html.light .field-inner input::placeholder { color: rgba(10,22,40,0.35) !important; }
+        html.light .field-inner input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset !important;
+            -webkit-text-fill-color: #0A1628 !important;
+        }
+        html.light .field label { color: rgba(10,22,40,0.50) !important; }
+        html.light .sec-label { color: rgba(46,109,164,0.70) !important; }
+        html.light .sec-title { color: #0A1628 !important; }
+        html.light .info-row p { color: rgba(10,22,40,0.65) !important; }
+        html.light .info-row strong { color: #0A1628 !important; }
+        html.light .link-url { background: rgba(46,109,164,0.05); color: #2E6DA4; }
+        html.light .link-central { background: rgba(46,109,164,0.04); border-color: rgba(46,109,164,0.14); }
+        /* Theme toggle btn light */
+        html.light #themeToggleManut { color: #2E6DA4; background: rgba(46,109,164,0.08); }
+
+        /* ── Radial glow ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 70% 50% at 50% -5%, rgba(46,109,164,0.20) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 30% at 100% 100%, rgba(46,109,164,0.08) 0%, transparent 55%);
+            z-index: 0;
+        }
+
+        /* ── Decorative corner brackets ── */
+        .corner-frame {
+            position: fixed;
+            width: 64px;
+            height: 64px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .corner-frame.tl { top: 24px; left: 24px; border-top: 1px solid rgba(46,109,164,0.35); border-left: 1px solid rgba(46,109,164,0.35); }
+        .corner-frame.tr { top: 24px; right: 24px; border-top: 1px solid rgba(46,109,164,0.35); border-right: 1px solid rgba(46,109,164,0.35); }
+        .corner-frame.bl { bottom: 24px; left: 24px; border-bottom: 1px solid rgba(46,109,164,0.35); border-left: 1px solid rgba(46,109,164,0.35); }
+        .corner-frame.br { bottom: 24px; right: 24px; border-bottom: 1px solid rgba(46,109,164,0.35); border-right: 1px solid rgba(46,109,164,0.35); }
+
+        /* ── Loader ── */
+        .loader {
+            border: 3px solid rgba(46,109,164,0.15);
+            border-top: 3px solid #2E6DA4;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Card ── */
+        .card {
+            background: rgba(17, 30, 53, 0.92);
+            border: 1px solid rgba(46,109,164,0.22);
+            border-radius: 16px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        /* Top accent line on card */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 20%; right: 20%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(46,109,164,0.7), transparent);
+        }
+        /* Decorative inner corners */
+        .card-corner-tl {
+            position: absolute; top: 14px; left: 14px;
+            width: 20px; height: 20px;
+            border-top: 1.5px solid rgba(46,109,164,0.4);
+            border-left: 1.5px solid rgba(46,109,164,0.4);
+        }
+        .card-corner-br {
+            position: absolute; bottom: 14px; right: 14px;
+            width: 20px; height: 20px;
+            border-bottom: 1.5px solid rgba(46,109,164,0.4);
+            border-right: 1.5px solid rgba(46,109,164,0.4);
+        }
+
+        /* ── Steel Gradient Button ── */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #2E6DA4 0%, #1A4A72 100%);
+            border: none;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            color: #E8EDF4;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 6px;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+            transition: left 0.5s ease;
+        }
+        .btn-primary:hover::before { left: 100%; }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(46,109,164,0.40); }
+        .btn-primary:active { transform: scale(0.99); }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* ── Ghost / Outline Button (link-style) ── */
+        .btn-link {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px 14px;
+            background: none;
+            border: 1px solid rgba(46,109,164,0.30);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            color: #4A8DC4;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            transition: all 0.25s ease;
+        }
+        .btn-link:hover { background: rgba(46,109,164,0.15); border-color: #4A8DC4; color: #E8EDF4; }
+        .btn-link.copiado { border-color: #60B080; color: #60B080; }
+
+        /* ── Field / Input ── */
+        .field { margin-bottom: 20px; }
+        .field label {
+            display: block;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.20em;
+            color: rgba(154,173,196,0.70);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .field-inner { position: relative; }
+        .field-inner i.fi {
+            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            color: #2E6DA4; font-size: 13px; pointer-events: none; width: 18px;
+        }
+        .field-inner input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid rgba(46,109,164,0.25);
+            padding: 10px 38px 10px 24px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #E8EDF4;
+            outline: none;
+            transition: border-color 0.25s ease;
+        }
+        .field-inner input:focus { border-bottom-color: #2E6DA4; }
+        .field-inner input::placeholder { color: rgba(154,173,196,0.40); font-size: 13px; }
+        .field-inner input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 1000px #111E35 inset;
+            -webkit-text-fill-color: #E8EDF4;
+        }
+        .toggle-btn {
+            position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: rgba(154,173,196,0.45);
+            cursor: pointer; font-size: 12px; padding: 4px;
+            transition: color 0.2s;
+        }
+        .toggle-btn:hover { color: #4A8DC4; }
+
+        /* ── Section labels ── */
+        .sec-label {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.20em;
+            color: rgba(46,109,164,0.60);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .sec-title {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #E8EDF4;
+            letter-spacing: 0.04em;
+            margin-bottom: 22px;
+        }
+
+        /* ── Divider ── */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 10px 0 18px;
+        }
+        .divider::before, .divider::after {
+            content: ''; flex: 1; height: 1px;
+            background: rgba(46,109,164,0.18);
+        }
+        .divider span {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 10px;
+            letter-spacing: 0.22em;
+            color: rgba(154,173,196,0.45);
+            white-space: nowrap;
+            font-style: italic;
+        }
+
+        /* ── Password Strength ── */
+        .strength-bg { height: 3px; background: rgba(46,109,164,0.12); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+        .strength-fill { height: 100%; border-radius: 2px; width: 0%; transition: width 0.35s, background 0.35s; }
+        .strength-label { font-size: 10px; color: rgba(154,173,196,0.50); margin-top: 4px; }
+
+        /* ── Info Box ── */
+        .info-box {
+            background: rgba(46,109,164,0.06);
+            border: 1px solid rgba(46,109,164,0.15);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .info-row {
+            display: flex; gap: 10px; align-items: flex-start;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(46,109,164,0.08);
+        }
+        .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .info-row i { color: #4A8DC4; font-size: 12px; margin-top: 2px; width: 16px; flex-shrink: 0; }
+        .info-row p { font-size: 12px; color: rgba(154,173,196,0.75); line-height: 1.65; }
+        .info-row strong { color: #E8EDF4; font-weight: 600; }
+
+        /* ── Security Badge ── */
+        .security-note {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 12px 14px;
+            background: rgba(46,120,80,0.07);
+            border: 1px solid rgba(58,120,80,0.22);
+            border-radius: 10px;
+            margin-bottom: 18px;
+        }
+        .security-note i { color: #60B080; font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+        .security-note p { font-size: 11px; color: #60B080; line-height: 1.6; }
+
+        /* ── Msg Box ── */
+        .msg-box { display: none; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; font-size: 12.5px; }
+        .msg-box.show { display: flex; }
+        .msg-box.error   { background: rgba(200,80,60,0.10); color: #E08070; border: 1px solid rgba(200,80,60,0.22); }
+        .msg-box.success { background: rgba(58,120,80,0.10); color: #60B080; border: 1px solid rgba(58,120,80,0.22); }
+        .msg-box i { font-size: 13px; flex-shrink: 0; }
+
+        /* ── Views ── */
+        .view { display: none; }
+        .view.active { display: block; }
+
+        /* ── Link URL display ── */
+        .link-url {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 13px;
+            color: #4A8DC4;
+            word-break: break-all;
+            margin: 8px 0;
+            padding: 10px 14px;
+            background: rgba(46,109,164,0.06);
+            border: 1px solid rgba(46,109,164,0.18);
+            border-radius: 8px;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+        .link-central {
+            background: rgba(46,109,164,0.06);
+            border: 1px solid rgba(46,109,164,0.18);
+            border-radius: 10px;
+            padding: 18px;
+            margin-top: 22px;
+        }
+
+        /* ── Back link ── */
+        .back-link {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 10px; letter-spacing: 0.18em;
+            color: rgba(154,173,196,0.40);
+            text-transform: uppercase; text-decoration: none;
+            transition: color 0.25s ease;
+        }
+        .back-link:hover { color: #4A8DC4; }
+
+        /* ── Animations ── */
+        @keyframes fadeUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.7s ease both; }
+
+        /* ── Emblem spin ── */
+        @keyframes emblem-spin { to { transform: rotate(360deg); } }
+        .emblem-spin { animation: emblem-spin 12s linear infinite; }
+    </style>
+</head>
+
+<body class="font-sans">
+
+<!-- ── Theme Toggle Button (fixed) ── -->
+<button id="themeToggleManut"
+        onclick="toggleThemeManut()"
+        style="position:fixed; top:16px; right:16px; z-index:100;
+               width:38px; height:38px; border-radius:8px;
+               border: 1px solid rgba(46,109,164,0.30);
+               background: rgba(46,109,164,0.10);
+               color: #4A8DC4; font-size:14px;
+               cursor:pointer; display:flex; align-items:center; justify-content:center;
+               transition: all 0.25s ease;">
+    <i id="themeIconManut" class="fas fa-sun"></i>
+</button>
+
+<!-- ── Decorative corner frames ── -->
+<div class="corner-frame tl"></div>
+<div class="corner-frame tr"></div>
+<div class="corner-frame bl"></div>
+<div class="corner-frame br"></div>
+
+<!-- ── Global Loader ── -->
+<div id="globalLoader"
+     class="fixed inset-0 z-[200] items-center justify-center bg-navy/70 backdrop-blur-sm"
+     style="display:none;">
+    <div class="flex flex-col items-center gap-4">
+        <div class="loader"></div>
+        <span class="text-[10px] font-semibold tracking-[0.28em] uppercase text-steelLight">Verificando</span>
+    </div>
+</div>
+
+<!-- ── Main Wrapper ── -->
+<div class="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-16 fade-up">
+
+    <!-- ══ Emblem ══ -->
+    <div class="flex flex-col items-center mb-10">
+
+        <!-- Diamond / badge icon -->
+        <div class="relative w-20 h-20 flex items-center justify-center mb-5">
+            <!-- Spinning outer ring -->
+            <div class="emblem-spin absolute inset-0 rounded-full"
+                 style="border: 1px solid rgba(46,109,164,0.18); border-top-color: rgba(46,109,164,0.70);"></div>
+            <!-- Inner static ring -->
+            <div class="absolute inset-2 rounded-full"
+                 style="border: 1px solid rgba(46,109,164,0.12);"></div>
+            <!-- Icon -->
+            <div class="relative z-10 w-12 h-12 flex items-center justify-center rounded-xl"
+                 style="background: linear-gradient(135deg, #2E6DA4 0%, #1A4A72 100%); box-shadow: 0 6px 24px rgba(46,109,164,0.5);">
+                <i class="fas fa-scale-balanced text-white text-lg"></i>
+            </div>
+        </div>
+
+        <h1 class="font-serif text-3xl font-bold tracking-widest text-iceWhite uppercase mb-1">
+            Painel Administrativo
+        </h1>
+        <p id="headerSub"
+           class="text-[10px] font-semibold tracking-[0.22em] uppercase"
+           style="color: rgba(46,109,164,0.65);">
+            Acesso restrito ao titular
+        </p>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         VIEW: Primeiro Acesso (Setup)
+    ══════════════════════════════════════════════ -->
+    <div class="view active card w-full max-w-md mb-4" id="viewSetup">
+        <div class="card-corner-tl"></div>
+        <div class="card-corner-br"></div>
+        <div class="p-8">
+
+            <span class="sec-label">
+                <i class="fas fa-gear mr-1.5 opacity-70 text-[8px]"></i>Configuração inicial
+            </span>
+            <h2 class="sec-title">Primeiro Acesso</h2>
+
+            <!-- Security badge -->
+            <div class="security-note">
+                <i class="fas fa-shield-halved"></i>
+                <p>Seus dados são criptografados com <strong>AES-256-GCM</strong> e armazenados de forma segura na nuvem. Nenhuma informação sensível fica visível na planilha.</p>
+            </div>
+
+            <!-- Info rows -->
+            <div class="info-box">
+                <div class="info-row">
+                    <i class="fas fa-envelope"></i>
+                    <p><strong>E-mail administrativo</strong> — seu usuário de login. Não precisa ser o e-mail público do escritório.</p>
+                </div>
+                <div class="info-row">
+                    <i class="fas fa-lock"></i>
+                    <p><strong>Senha de acesso</strong> — armazenada como hash criptográfico. Nem o servidor conhece sua senha em texto puro.</p>
+                </div>
+                <div class="info-row">
+                    <i class="fas fa-key"></i>
+                    <p><strong>Palavra-chave secreta</strong> — digitada no campo de busca da página inicial, abre este painel silenciosamente. Ex: <em style="color:#4A8DC4">escritorio2026</em></p>
+                </div>
+            </div>
+
+            <!-- Fields -->
+            <div class="field">
+                <label>E-mail Administrativo</label>
+                <div class="field-inner">
+                    <i class="fas fa-at fi"></i>
+                    <input type="email" id="setupEmail" autocomplete="email" placeholder="seu@email.com">
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Senha de Acesso</label>
+                <div class="field-inner">
+                    <i class="fas fa-lock fi"></i>
+                    <input type="password" id="setupSenha" autocomplete="new-password"
+                           placeholder="Mínimo 8 caracteres" oninput="avaliarForca(this.value)">
+                    <button class="toggle-btn" type="button" onclick="toggleVer('setupSenha',this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="strength-bg"><div class="strength-fill" id="strFill"></div></div>
+                <div class="strength-label" id="strLabel"></div>
+            </div>
+
+            <div class="field">
+                <label>Confirmar Senha</label>
+                <div class="field-inner">
+                    <i class="fas fa-lock fi"></i>
+                    <input type="password" id="setupConf" autocomplete="new-password" placeholder="Repita a senha">
+                    <button class="toggle-btn" type="button" onclick="toggleVer('setupConf',this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="divider"><span>acesso secreto</span></div>
+
+            <div class="field">
+                <label>Palavra-chave Secreta</label>
+                <div class="field-inner">
+                    <i class="fas fa-key fi"></i>
+                    <input type="text" id="setupPalavra" autocomplete="off" placeholder="Ex: escritoriosilva2026">
+                    <button class="toggle-btn" type="button" onclick="toggleVer('setupPalavra',this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="msg-box" id="setupMsg">
+                <i class="fas fa-circle-xmark"></i>
+                <span id="setupMsgText"></span>
+            </div>
+
+            <button class="btn-primary" id="btnSetup" onclick="salvarPrimeiroAcesso()">
+                <i class="fas fa-shield-halved mr-2 opacity-80"></i>
+                Salvar com Criptografia
+            </button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         VIEW: Login Normal
+    ══════════════════════════════════════════════ -->
+    <div class="view card w-full max-w-md mb-4" id="viewLogin">
+        <div class="card-corner-tl"></div>
+        <div class="card-corner-br"></div>
+        <div class="p-8">
+
+            <span class="sec-label">
+                <i class="fas fa-fingerprint mr-1.5 opacity-70 text-[8px]"></i>Autenticação
+            </span>
+            <h2 class="sec-title">Entrar no Painel</h2>
+
+            <div class="field">
+                <label>E-mail Administrativo</label>
+                <div class="field-inner">
+                    <i class="fas fa-at fi"></i>
+                    <input type="email" id="adminUser" autocomplete="email" placeholder="seu@email.com">
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Senha</label>
+                <div class="field-inner">
+                    <i class="fas fa-lock fi"></i>
+                    <input type="password" id="adminPass" autocomplete="current-password"
+                           placeholder="Sua senha"
+                           onkeydown="if(event.key==='Enter') realizarLoginAdmin()">
+                    <button class="toggle-btn" type="button" onclick="toggleVer('adminPass',this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="msg-box" id="loginMsg">
+                <i class="fas fa-circle-xmark"></i>
+                <span id="loginMsgText"></span>
+            </div>
+
+            <button class="btn-primary" id="btnLogin" onclick="realizarLoginAdmin()">
+                <i class="fas fa-right-to-bracket mr-2 opacity-80"></i>Acessar Painel
+            </button>
+
+            <!-- ── Link Central ── -->
+            <div class="link-central">
+                <span class="sec-label" style="margin-bottom:6px;">
+                    <i class="fas fa-link mr-1.5 opacity-70"></i>Link para enviar aos clientes
+                </span>
+                <div class="link-url" id="linkUrl">https://site-advogado.github.io/index.html</div>
+                <div class="flex gap-2 flex-wrap mt-3">
+                    <button class="btn-link" id="btnCopiar" onclick="copiarLink()">
+                        <i class="fas fa-copy"></i> Copiar Link
+                    </button>
+                    <button class="btn-link" onclick="abrirWhatsApp()">
+                        <i class="fab fa-whatsapp"></i> Enviar WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         VIEW: Sucesso Setup
+    ══════════════════════════════════════════════ -->
+    <div class="view card w-full max-w-md mb-4" id="viewSucesso" style="text-align:center;">
+        <div class="card-corner-tl"></div>
+        <div class="card-corner-br"></div>
+        <div class="p-12">
+
+            <!-- Success icon -->
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
+                 style="background: rgba(58,120,80,0.12); border: 1px solid rgba(58,120,80,0.28);">
+                <i class="fas fa-shield-halved text-2xl" style="color:#60B080;"></i>
+            </div>
+
+            <h2 class="font-serif text-2xl font-bold text-iceWhite mb-3 tracking-wide">
+                Configuração Segura
+            </h2>
+            <p style="font-size:13px; color:rgba(154,173,196,0.70); line-height:1.8; margin-bottom:6px;">
+                Suas credenciais foram criptografadas com
+                <strong style="color:#4A8DC4;">AES-256-GCM</strong> e armazenadas com segurança.
+            </p>
+            <p style="font-size:13px; color:rgba(154,173,196,0.70); line-height:1.8; margin-bottom:28px;">
+                Nenhum dado sensível foi salvo na planilha. Agora faça login para acessar o painel de gestão.
+            </p>
+
+            <button class="btn-primary" onclick="mostrarLogin()">
+                <i class="fas fa-right-to-bracket mr-2 opacity-80"></i>Ir para o Login
+            </button>
+        </div>
+    </div>
+
+    <!-- Back link -->
+    <a href="index.html" class="back-link mt-4">
+        <i class="fas fa-arrow-left text-[10px]"></i>
+        Voltar ao início
+    </a>
+
+</div>
+
+<!-- ── Script original 100% preservado ── -->
+<script>
+// ── Constantes ────────────────────────────────────────────
+const URL_BASE = 'https://api-advogada.siterefrigeracaoeliezer.workers.dev';
+const URL_API  = URL_BASE + '/api/v1';
+const SITE_URL = 'https://site-advogado.github.io/index.html';
+
+let _nomeAdvogada = '';
+
+// ── Loading ───────────────────────────────────────────────
+function showLoading() { document.getElementById('globalLoader').style.display = 'flex'; }
+function hideLoading() { document.getElementById('globalLoader').style.display = 'none'; }
+
+// ── Views ─────────────────────────────────────────────────
+function mostrarView(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+function mostrarLogin() { mostrarView('viewLogin'); }
+
+// ── Helpers ────────────────────────────────────────────────
+function toggleVer(id, btn) {
+    const inp = document.getElementById(id);
+    const isP = inp.type === 'password';
+    inp.type = isP ? 'text' : 'password';
+    btn.querySelector('i').className = isP ? 'fas fa-eye-slash' : 'fas fa-eye';
+}
+
+function showMsg(id, txtId, txt, tipo) {
+    const box  = document.getElementById(id);
+    const span = document.getElementById(txtId);
+    box.className = 'msg-box show ' + tipo;
+    box.querySelector('i').className =
+        tipo === 'error' ? 'fas fa-circle-xmark' : 'fas fa-circle-check';
+    span.textContent = txt;
+}
+function hideMsg(id) { document.getElementById(id).className = 'msg-box'; }
+
+// ── Força da senha ─────────────────────────────────────────
+function avaliarForca(v) {
+    const fill  = document.getElementById('strFill');
+    const label = document.getElementById('strLabel');
+    if (!v) { fill.style.width = '0%'; label.textContent = ''; return; }
+    let score = 0;
+    if (v.length >= 8)           score++;
+    if (v.length >= 12)          score++;
+    if (/[A-Z]/.test(v))         score++;
+    if (/[0-9]/.test(v))         score++;
+    if (/[^A-Za-z0-9]/.test(v))  score++;
+    const lvs = [
+        { w:'20%', c:'#C04A3A', t:'Muito fraca'  },
+        { w:'40%', c:'#C07830', t:'Fraca'        },
+        { w:'60%', c:'#B89830', t:'Média'        },
+        { w:'80%', c:'#3A7A5A', t:'Forte'        },
+        { w:'100%',c:'#3A7A5A', t:'Muito forte'  },
+    ];
+    const lv = lvs[Math.min(score, 4)];
+    fill.style.width      = lv.w;
+    fill.style.background = lv.c;
+    label.textContent     = lv.t;
+    label.style.color     = lv.c;
+}
+
+// ── Detectar estado ───────────────────────────────────────
+async function detectarEstado() {
+    showLoading();
+    try {
+        const res  = await fetch(URL_BASE + '/api/verificar-setup', {
+            method: 'GET', credentials: 'include',
+        });
+        const data = await res.json();
+
+        if (data.primeiro_acesso) {
+            mostrarView('viewSetup');
+            document.getElementById('headerSub').textContent = 'Configure o acesso pela primeira vez';
+        } else {
+            mostrarView('viewLogin');
+            document.getElementById('headerSub').textContent = 'Acesso restrito ao titular do escritório';
+            document.getElementById('linkUrl').textContent = SITE_URL;
+            // Carregar nome para WhatsApp em segundo plano
+            fetch(URL_API, { method:'POST', credentials:'include',
+                headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({ action:'bio' }) })
+            .then(r => r.json())
+            .then(d => { if (d.name) _nomeAdvogada = d.name; })
+            .catch(() => {});
+        }
+    } catch {
+        mostrarView('viewLogin');
+    } finally {
+        hideLoading();
+    }
+}
+
+// ── Salvar primeiro acesso ────────────────────────────────
+async function salvarPrimeiroAcesso() {
+    hideMsg('setupMsg');
+
+    const email   = document.getElementById('setupEmail').value.trim().toLowerCase();
+    const senha   = document.getElementById('setupSenha').value;
+    const conf    = document.getElementById('setupConf').value;
+    const palavra = document.getElementById('setupPalavra').value.trim().toLowerCase();
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        return showMsg('setupMsg','setupMsgText','E-mail inválido.','error');
+    if (senha.length < 8)
+        return showMsg('setupMsg','setupMsgText','A senha deve ter pelo menos 8 caracteres.','error');
+    if (senha !== conf)
+        return showMsg('setupMsg','setupMsgText','As senhas não coincidem.','error');
+    if (palavra.length < 4)
+        return showMsg('setupMsg','setupMsgText','A palavra-chave deve ter pelo menos 4 caracteres.','error');
+    if (['admin','senha','acesso','1234','senha123'].includes(palavra))
+        return showMsg('setupMsg','setupMsgText','Escolha uma palavra-chave mais exclusiva.','error');
+
+    const btn = document.getElementById('btnSetup');
+    btn.disabled = true;
+    showLoading();
+
+    try {
+        const res  = await fetch(URL_BASE + '/api/setup-admin', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, senha, palavra_secreta: palavra }),
+        });
+        const data = await res.json();
+
+        if (data.status === 'ok') {
+            mostrarView('viewSucesso');
+        } else {
+            showMsg('setupMsg','setupMsgText', data.message || 'Erro ao salvar.','error');
+            btn.disabled = false;
+        }
+    } catch {
+        showMsg('setupMsg','setupMsgText','Erro de conexão com o servidor.','error');
+        btn.disabled = false;
+    } finally {
+        hideLoading();
+    }
+}
+
+// ── Login admin ────────────────────────────────────────────
+async function realizarLoginAdmin() {
+    hideMsg('loginMsg');
+
+    const user = document.getElementById('adminUser').value.trim().toLowerCase();
+    const pass = document.getElementById('adminPass').value;
+
+    if (!user) return showMsg('loginMsg','loginMsgText','Preencha o e-mail.','error');
+    if (!pass) return showMsg('loginMsg','loginMsgText','Preencha a senha.','error');
+
+    const btn = document.getElementById('btnLogin');
+    btn.disabled = true;
+    showLoading();
+
+    try {
+        const res  = await fetch(URL_API, {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'login_admin', usuario: user, senha: pass }),
+        });
+        const data = await res.json();
+
+        if (data.status === 'sucesso') {
+            window.location.href = 'configuracao.html';
+        } else {
+            showMsg('loginMsg','loginMsgText', data.message || 'Credenciais inválidas.','error');
+            btn.disabled = false;
+        }
+    } catch {
+        showMsg('loginMsg','loginMsgText','Erro de conexão.','error');
+        btn.disabled = false;
+    } finally {
+        hideLoading();
+    }
+}
+
+// ── Central de Links ───────────────────────────────────────
+function copiarLink() {
+    const url = document.getElementById('linkUrl').textContent.trim();
+    navigator.clipboard.writeText(url)
+        .then(() => {
+            const btn = document.getElementById('btnCopiar');
+            btn.classList.add('copiado');
+            btn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+            setTimeout(() => {
+                btn.classList.remove('copiado');
+                btn.innerHTML = '<i class="fas fa-copy"></i> Copiar Link';
+            }, 2500);
+        })
+        .catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+            const btn = document.getElementById('btnCopiar');
+            btn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+            setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> Copiar Link'; }, 2500);
+        });
+}
+
+function abrirWhatsApp() {
+    const url  = document.getElementById('linkUrl').textContent.trim();
+    const nome = _nomeAdvogada || 'Nosso Escritório';
+    const msg  = encodeURIComponent(
+        `Olá! 👋\n\n` +
+        `${nome} disponibiliza um portal seguro e exclusivo para o acompanhamento do seu processo jurídico.\n\n` +
+        `Através do link abaixo, você pode verificar as atualizações, status e toda a linha do tempo do seu caso, ` +
+        `de forma privada e acessível a qualquer momento:\n\n` +
+        `🔗 ${url}\n\n` +
+        `Para acessar, utilize o e-mail que você cadastrou conosco. ` +
+        `Um código de verificação será enviado para confirmar sua identidade.\n\n` +
+        `Qualquer dúvida, estamos à disposição.`
+    );
+    window.open(`https://wa.me/?text=${msg}`, '_blank');
+}
+
+// ── Init ───────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+    detectarEstado();
+    // Sincronizar ícone do botão de tema
+    var saved = localStorage.getItem('ADV_GLOBAL_THEME') || 'dark';
+    var icon  = document.getElementById('themeIconManut');
+    if (icon) {
+        icon.className = saved === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+});
+
+// ── Toggle Tema ─────────────────────────────────────────────
+function toggleThemeManut() {
+    var html  = document.documentElement;
+    var isDark = html.classList.contains('dark');
+    var next   = isDark ? 'light' : 'dark';
+    var icon   = document.getElementById('themeIconManut');
+
+    if (next === 'dark') {
+        html.classList.add('dark');
+        html.classList.remove('light');
+        if (icon) icon.className = 'fas fa-sun';
+    } else {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        if (icon) icon.className = 'fas fa-moon';
+    }
+    localStorage.setItem('ADV_GLOBAL_THEME', next);
+}
+</script>
+
+</body>
+</html>
