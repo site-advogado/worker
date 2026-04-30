@@ -11,6 +11,11 @@
 
 // URL_API vem de tema.js — NÃO redefinir aqui
 // Palavra de bootstrap — funciona antes da planilha ter palavra_secreta
+
+const URL_API = 'https://api-advogada.siterefrigeracaoeliezer.workers.dev/api/v1';
+let countdownInterval;
+let deferredPrompt;
+
 const BOOTSTRAP_WORD = 'admin';
 
 let countdownInterval;
